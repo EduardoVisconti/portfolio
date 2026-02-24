@@ -4,20 +4,22 @@
 
 :root {
   --background: #ffffff;
-  --foreground: #171717;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --foreground: #0a0a0a;
+  --muted: #737373;
+  --accent: #22c55e;
+  --accent-light: #dcfce7;
+  --accent-dark: #16a34a;
+  --border: #e5e5e5;
+  --card: #fafafa;
 }
 
 body {
   color: var(--foreground);
   background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+}
+
+html {
+  scroll-behavior: smooth;
 }
 
 @layer utilities {
