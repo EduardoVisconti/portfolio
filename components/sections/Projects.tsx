@@ -18,9 +18,9 @@ const cardVariants = {
 };
 
 const tagColors: Record<string, string> = {
-	'SaaS Dashboard': 'bg-blue-50 text-blue-600',
+	'Asset Management Platform': 'bg-blue-50 text-blue-600',
 	'AI Tool': 'bg-purple-50 text-purple-600',
-	'Fitness App': 'bg-orange-50 text-orange-600',
+	'E-commerce Platform': 'bg-orange-50 text-orange-600',
 	'Client Project': 'bg-accent-light text-accent-dark'
 };
 
