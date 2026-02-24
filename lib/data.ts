@@ -5,7 +5,7 @@ export const siteConfig = {
 	role: 'Frontend Developer',
 	location: 'Tampa, FL',
 	email: 'eduardo.visconti.dev@gmail.com',
-	linkedin: 'https://linkedin.com/in/eduardovisconti',
+	linkedin: 'https://linkedin.com/in/eduardo-visconti',
 	github: 'https://github.com/eduardovisconti'
 };
 
@@ -33,9 +33,9 @@ export const aboutData = {
 export const projectsData: Project[] = [
 	{
 		title: 'AssetOps',
-		tag: 'SaaS Dashboard',
+		tag: 'Enterprise Asset Operations',
 		description:
-			'Enterprise asset management dashboard with real-time tracking, advanced filtering, and data visualization.',
+			'Enterprise asset operations platform with equipment management, maintenance tracking, audit logs, historical records, and analytics dashboards.',
 		tech: ['React', 'TypeScript', 'TanStack Table', 'Zustand', 'TailwindCSS'],
 		image: '/projects/assetops.png',
 		liveUrl: 'https://asset-ops.vercel.app/login',
@@ -53,9 +53,9 @@ export const projectsData: Project[] = [
 	},
 	{
 		title: 'Ozyn Fit',
-		tag: 'Fitness App',
+		tag: 'E-commerce Platform',
 		description:
-			'Fitness tracking application for workout management and progress monitoring.',
+			'Full-stack e-commerce web app with React frontend, Node/Express backend, Firebase authentication, and Stripe Checkout.',
 		tech: ['React', 'TypeScript', 'Firebase', 'TailwindCSS'],
 		image: '/projects/ozynfit.png',
 		liveUrl: 'https://ozynfit.web.app/',
@@ -109,7 +109,7 @@ export const experienceData: TimelineItem[] = [
 		title: 'AssetOps',
 		subtitle: 'Personal Project',
 		description:
-			'Designed and developed a full SaaS-style asset management dashboard with real-time tracking and advanced filtering.',
+			'Enterprise asset operations platform with equipment management, maintenance tracking, audit logs, historical records, and analytics dashboards.',
 		type: 'project'
 	},
 	{
@@ -162,7 +162,7 @@ export const socialLinks: SocialLink[] = [
 	},
 	{
 		name: 'LinkedIn',
-		url: 'https://linkedin.com/in/eduardovisconti',
+		url: 'https://linkedin.com/in/eduardo-visconti',
 		icon: 'linkedin'
 	},
 	{
@@ -181,8 +181,8 @@ About Eduardo:
 - Works with React, TypeScript, Next.js, TailwindCSS, TanStack Query,
   Zustand, React Hook Form, Zod
 - Open to remote opportunities globally
-- Projects: AssetOps (SaaS dashboard), ResumeAI (AI tool),
-  Ozyn Fit (fitness app), Psychology practice landing page
+- Projects: AssetOps (Asset Management Platform), ResumeAI (AI tool),
+  Ozyn Fit (E-commerce Platform), Psychology practice landing page
 - Passionate about clean code, modern UI, and AI integration
 - Currently building portfolio projects and seeking new opportunities
 - Education: Systems Analysis & Development (Anhanguera), CompTIA IT Fundamentals,
