@@ -11,6 +11,18 @@ const config: Config = {
       colors: {
         background: "var(--background)",
         foreground: "var(--foreground)",
+        muted: "var(--muted)",
+        accent: {
+          DEFAULT: "var(--accent)",
+          light: "var(--accent-light)",
+          dark: "var(--accent-dark)",
+        },
+        border: "var(--border)",
+        card: "var(--card)",
+      },
+      fontFamily: {
+        sans: ["var(--font-inter)"],
+        display: ["var(--font-playfair)"],
       },
     },
   },
