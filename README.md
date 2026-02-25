@@ -13,7 +13,7 @@
 
 ## 📸 Preview
 
-![Portfolio Homepage](./public/preview.png)
+![Portfolio Homepage](./public/preview.gif)
 _Clean, modern design showcasing projects and experience_
 
 ---
@@ -276,79 +276,3 @@ This project is open source and available under the [MIT License](LICENSE).
 ---
 
 **⭐ If you like this portfolio, feel free to star the repo!**
-
-```
-
----
-
-## 📊 COMPARAÇÃO: VOCÊ vs MÉDIA DOS JÚNIOR
-
-| Aspecto | Você | Júnior Médio |
-|---------|------|--------------|
-| **Portfolio pessoal** | ✅ Profissional | ❌ Não tem ou muito básico |
-| **Projetos reais** | ✅ 4 projetos fortes | ⚠️ 1-2 tutoriais |
-| **AI Integration** | ✅ Resume Analyzer | ❌ Não tem |
-| **Design** | ✅ Limpo e moderno | ⚠️ Templates genéricos |
-| **Deploy** | ✅ Vercel (3 projetos) | ⚠️ 1 projeto ou nenhum |
-| **README** | ⚠️ Vai ter agora | ❌ Não tem |
-| **Tech stack** | ✅ Moderna (Next 14, TS) | ⚠️ CRA, JS básico |
-
-**CONCLUSÃO:** Você tá **MUITO acima** da média.
-
----
-
-## 🎯 PRÓXIMOS PASSOS
-
-### ✅ AGORA (próximas 24h):
-
-1. **Adiciona o README no portfolio**
-   - Cola o texto acima
-   - Tira screenshot do site
-   - Salva como `public/preview.png`
-   - Commit e push
-
-2. **Atualiza currículo** com links novos:
-```
-
-Projects:
-
-- Portfolio: eduardo-visconti.vercel.app
-- ResumeAI: resumeai-analyzer.vercel.app
-- AssetOps: asset-ops.vercel.app
-
-```
-
-3. **Atualiza LinkedIn:**
-   - Posta sobre os projetos
-   - Adiciona nos "Featured"
-   - Menciona AI integration
-
-### 🚀 SEMANA QUE VEM:
-
-4. **Aplica com TUDO isso**
-   - Currículo atualizado
-   - Portfolio no signature do email
-   - Resume Analyzer na cover letter:
-```
-
-     "I recently built ResumeAI (resumeai-analyzer.vercel.app),
-     an AI-powered resume analyzer using Claude API..."
-
-```
-
-5. **Cria post no LinkedIn:**
-```
-
-Excited to share two projects I've been working on:
-
-🚀 Personal Portfolio — Modern Next.js site showcasing my work
-🤖 ResumeAI — AI-powered resume analyzer with Claude API
-
-Built with React, TypeScript, Next.js, and Anthropic Claude.
-
-Check them out:
-
-- eduardo-visconti.vercel.app
-- resumeai-analyzer.vercel.app
-
-#WebDevelopment #AI #React #NextJS #TypeScript
