@@ -2,7 +2,6 @@
 
 import { motion } from 'framer-motion';
 import SectionTitle from '@/components/shared/SectionTitle';
-import { techStackData } from '@/lib/data';
 
 const techIcons: Record<string, string> = {
 	react: '⚛️',
@@ -14,30 +13,74 @@ const techIcons: Record<string, string> = {
 	tanstack: '🔄',
 	reacthookform: '📋',
 	zod: '✓',
-	firebase: '🔥',
-	git: '🔀',
-	vercel: '▲',
 	supabase: '🟢',
+	firebase: '🔥',
 	nodejs: '🟩',
 	claude: '🤖',
-	gemini: '✨'
+	gemini: '✨',
+	git: '🔀',
+	vercel: '▲'
 };
+
+const categories = [
+	{
+		label: 'Frontend',
+		techs: [
+			{ name: 'React', icon: 'react' },
+			{ name: 'Next.js', icon: 'nextjs' },
+			{ name: 'TypeScript', icon: 'typescript' },
+			{ name: 'JavaScript', icon: 'javascript' },
+			{ name: 'TailwindCSS', icon: 'tailwindcss' }
+		]
+	},
+	{
+		label: 'State & Data',
+		techs: [
+			{ name: 'TanStack Query', icon: 'tanstack' },
+			{ name: 'Zustand', icon: 'zustand' },
+			{ name: 'React Hook Form', icon: 'reacthookform' },
+			{ name: 'Zod', icon: 'zod' }
+		]
+	},
+	{
+		label: 'Backend & DB',
+		techs: [
+			{ name: 'Supabase', icon: 'supabase' },
+			{ name: 'Firebase', icon: 'firebase' },
+			{ name: 'Node.js', icon: 'nodejs' }
+		]
+	},
+	{
+		label: 'AI',
+		techs: [
+			{ name: 'Claude API', icon: 'claude' },
+			{ name: 'Gemini API', icon: 'gemini' }
+		]
+	},
+	{
+		label: 'Tools',
+		techs: [
+			{ name: 'Git', icon: 'git' },
+			{ name: 'Vercel', icon: 'vercel' }
+		]
+	}
+];
 
 const container = {
 	hidden: { opacity: 0 },
 	visible: {
 		opacity: 1,
-		transition: { staggerChildren: 0.08, delayChildren: 0.2 }
+		transition: { staggerChildren: 0.06, delayChildren: 0.1 }
 	}
 };
 
-const item = {
-	hidden: { opacity: 0, scale: 0.8, y: 20 },
+const chip = {
+	hidden: { opacity: 0, scale: 0.8, y: 16 },
 	visible: {
 		opacity: 1,
 		scale: 1,
 		y: 0,
-		transition: { duration: 0.4, ease: 'easeOut' as const }
+		transition: { duration: 0.35, ease: 'easeOut' as const }
 	}
 };
 
@@ -53,29 +96,47 @@ export default function TechStack() {
 					title='Tools I work with'
 				/>
 
-				<motion.div
-					variants={container}
-					initial='hidden'
-					whileInView='visible'
-					viewport={{ once: true, margin: '-60px' }}
-					className='grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-4'
-				>
-					{techStackData.map((tech) => (
+				<div className='space-y-8'>
+					{categories.map((cat, ci) => (
 						<motion.div
-							key={tech.name}
-							variants={item}
-							whileHover={{ y: -4, transition: { duration: 0.2 } }}
-							className='flex flex-col items-center gap-2 p-5 rounded-xl border border-border bg-background hover:border-accent hover:shadow-sm transition-all cursor-default'
+							key={cat.label}
+							initial={{ opacity: 0, y: 20 }}
+							whileInView={{ opacity: 1, y: 0 }}
+							viewport={{ once: true, margin: '-40px' }}
+							transition={{ duration: 0.4, delay: ci * 0.08, ease: 'easeOut' }}
 						>
-							<span className='text-2xl leading-none select-none'>
-								{techIcons[tech.icon] || '•'}
-							</span>
-							<span className='text-xs font-medium text-muted text-center'>
-								{tech.name}
-							</span>
+							{/* Category label */}
+							<p className='text-xs uppercase tracking-widest text-accent font-medium mb-3'>
+								{cat.label}
+							</p>
+
+							{/* Tech chips */}
+							<motion.div
+								variants={container}
+								initial='hidden'
+								whileInView='visible'
+								viewport={{ once: true, margin: '-40px' }}
+								className='flex flex-wrap gap-2'
+							>
+								{cat.techs.map((tech) => (
+									<motion.div
+										key={tech.name}
+										variants={chip}
+										whileHover={{ y: -3, transition: { duration: 0.15 } }}
+										className='flex items-center gap-2 px-4 py-2 rounded-full border border-border bg-background hover:border-accent hover:shadow-sm transition-all cursor-default'
+									>
+										<span className='text-base leading-none select-none'>
+											{techIcons[tech.icon] || '•'}
+										</span>
+										<span className='text-sm font-medium text-foreground'>
+											{tech.name}
+										</span>
+									</motion.div>
+								))}
+							</motion.div>
 						</motion.div>
 					))}
-				</motion.div>
+				</div>
 			</div>
 		</section>
 	);

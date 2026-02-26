@@ -1,58 +1,61 @@
-import Anthropic from "@anthropic-ai/sdk";
-import { aiSystemPrompt } from "@/lib/data";
+import { GoogleGenerativeAI } from '@google/generative-ai';
+import { NextResponse } from 'next/server';
+import { aiSystemPrompt } from '@/lib/data';
 
-const anthropic = new Anthropic({
-  apiKey: process.env.ANTHROPIC_API_KEY || "",
-});
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
 
 export async function POST(req: Request) {
-  try {
-    const { messages } = await req.json();
+	try {
+		if (!process.env.GEMINI_API_KEY) {
+			return NextResponse.json(
+				{ error: 'GEMINI_API_KEY not configured' },
+				{ status: 500 }
+			);
+		}
 
-    if (!process.env.ANTHROPIC_API_KEY) {
-      return new Response(
-        "AI chat is currently unavailable. Please reach out to Eduardo directly!",
-        { status: 200 }
-      );
-    }
+		const { messages } = await req.json();
 
-    const stream = await anthropic.messages.stream({
-      model: "claude-sonnet-4-20250514",
-      max_tokens: 300,
-      system: aiSystemPrompt,
-      messages: messages.map(
-        (m: { role: string; content: string }) => ({
-          role: m.role as "user" | "assistant",
-          content: m.content,
-        })
-      ),
-    });
+		const model = genAI.getGenerativeModel({
+			model: 'gemini-2.5-flash',
+			systemInstruction: aiSystemPrompt
+		});
 
-    const encoder = new TextEncoder();
-    const readable = new ReadableStream({
-      async start(controller) {
-        for await (const event of stream) {
-          if (
-            event.type === "content_block_delta" &&
-            event.delta.type === "text_delta"
-          ) {
-            controller.enqueue(encoder.encode(event.delta.text));
-          }
-        }
-        controller.close();
-      },
-    });
+		// Build history for multi-turn (all except last message)
+		const history = messages
+			.slice(0, -1)
+			.map((m: { role: string; content: string }) => ({
+				role: m.role === 'user' ? 'user' : 'model',
+				parts: [{ text: m.content }]
+			}));
 
-    return new Response(readable, {
-      headers: {
-        "Content-Type": "text/plain; charset=utf-8",
-        "Cache-Control": "no-cache",
-      },
-    });
-  } catch {
-    return new Response(
-      "Sorry, something went wrong. Please try again later!",
-      { status: 500 }
-    );
-  }
+		const chat = model.startChat({ history });
+
+		const lastMessage = messages[messages.length - 1];
+		const result = await chat.sendMessage(lastMessage.content);
+		const reply = result.response.text();
+
+		return NextResponse.json({ reply });
+	} catch (error) {
+		console.error('Chat error:', error);
+
+		// Fallback to gemini-2.0-flash if 2.5 not available
+		try {
+			const { messages } = await req.json().catch(() => ({ messages: [] }));
+			const model = genAI.getGenerativeModel({
+				model: 'gemini-2.0-flash',
+				systemInstruction: aiSystemPrompt
+			});
+			const lastMessage = messages[messages.length - 1];
+			const result = await model.generateContent(lastMessage?.content || '');
+			return NextResponse.json({ reply: result.response.text() });
+		} catch {
+			return NextResponse.json(
+				{
+					reply:
+						"Sorry, I'm having trouble connecting right now. You can reach Eduardo directly at eduardo.visconti.dev@gmail.com!"
+				},
+				{ status: 200 }
+			);
+		}
+	}
 }
