@@ -18,10 +18,10 @@ const cardVariants = {
 };
 
 const tagColors: Record<string, string> = {
-	'Asset Management Platform': 'bg-blue-50 text-blue-600',
+	'CRM Platform': 'bg-green-50 text-green-600',
+	'Enterprise Platform': 'bg-blue-50 text-blue-600',
 	'AI Tool': 'bg-purple-50 text-purple-600',
-	'E-commerce Platform': 'bg-orange-50 text-orange-600',
-	'Client Project': 'bg-accent-light text-accent-dark'
+	'E-commerce Platform': 'bg-orange-50 text-orange-600'
 };
 
 export default function Projects() {
