@@ -1,61 +1,50 @@
-import { GoogleGenerativeAI } from '@google/generative-ai';
+import Anthropic from '@anthropic-ai/sdk';
 import { NextResponse } from 'next/server';
-import { aiSystemPrompt } from '@/lib/data';
+import { ASSISTANT_CONTEXT } from '@/lib/assistant-context';
 
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
+export const runtime = 'nodejs';
+
+const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY! });
+
+type Msg = { role: 'user' | 'assistant'; content: string };
+
+const MAX_TURNS = 12;          // conversation depth cap
+const MAX_CHARS = 1200;        // per-message input cap
 
 export async function POST(req: Request) {
-	try {
-		if (!process.env.GEMINI_API_KEY) {
-			return NextResponse.json(
-				{ error: 'GEMINI_API_KEY not configured' },
-				{ status: 500 }
-			);
-		}
+  try {
+    const body = (await req.json()) as { messages?: Msg[] };
+    const incoming = Array.isArray(body.messages) ? body.messages : [];
+    if (!incoming.length) {
+      return NextResponse.json({ error: 'no messages' }, { status: 400 });
+    }
 
-		const { messages } = await req.json();
+    // Trim: keep the last MAX_TURNS exchanges, clamp each message length.
+    const messages = incoming
+      .slice(-MAX_TURNS * 2)
+      .map((m) => ({
+        role: m.role === 'assistant' ? ('assistant' as const) : ('user' as const),
+        content: String(m.content ?? '').slice(0, MAX_CHARS),
+      }))
+      .filter((m) => m.content.length > 0);
 
-		const model = genAI.getGenerativeModel({
-			model: 'gemini-2.5-flash',
-			systemInstruction: aiSystemPrompt
-		});
+    const res = await anthropic.messages.create({
+      model: 'claude-opus-5',
+      max_tokens: 600,
+      system: ASSISTANT_CONTEXT,
+      messages,
+    });
 
-		// Build history for multi-turn (all except last message)
-		const history = messages
-			.slice(0, -1)
-			.map((m: { role: string; content: string }) => ({
-				role: m.role === 'user' ? 'user' : 'model',
-				parts: [{ text: m.content }]
-			}));
+    const reply = res.content
+      .filter((b): b is Anthropic.TextBlock => b.type === 'text')
+      .map((b) => b.text)
+      .join('')
+      .trim();
 
-		const chat = model.startChat({ history });
-
-		const lastMessage = messages[messages.length - 1];
-		const result = await chat.sendMessage(lastMessage.content);
-		const reply = result.response.text();
-
-		return NextResponse.json({ reply });
-	} catch (error) {
-		console.error('Chat error:', error);
-
-		// Fallback to gemini-2.0-flash if 2.5 not available
-		try {
-			const { messages } = await req.json().catch(() => ({ messages: [] }));
-			const model = genAI.getGenerativeModel({
-				model: 'gemini-2.0-flash',
-				systemInstruction: aiSystemPrompt
-			});
-			const lastMessage = messages[messages.length - 1];
-			const result = await model.generateContent(lastMessage?.content || '');
-			return NextResponse.json({ reply: result.response.text() });
-		} catch {
-			return NextResponse.json(
-				{
-					reply:
-						"Sorry, I'm having trouble connecting right now. You can reach Eduardo directly at eduardo.visconti.dev@gmail.com!"
-				},
-				{ status: 200 }
-			);
-		}
-	}
+    return NextResponse.json({ reply });
+  } catch (err) {
+    console.error('[api/chat]', err);
+    // The client owns the user-facing fallback copy (ASK.fallback).
+    return NextResponse.json({ error: 'upstream' }, { status: 502 });
+  }
 }

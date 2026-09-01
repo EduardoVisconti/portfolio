@@ -1,60 +1,35 @@
-import { Resend } from 'resend';
 import { NextResponse } from 'next/server';
+import { Resend } from 'resend';
+
+export const runtime = 'nodejs';
+
+const resend = new Resend(process.env.RESEND_API_KEY!);
 
 export async function POST(req: Request) {
-	try {
-		const body = await req.json();
-		const name = String(body?.name ?? '').trim();
-		const email = String(body?.email ?? '').trim();
-		const message = String(body?.message ?? '').trim();
+  try {
+    const { name, email, message } = (await req.json()) as {
+      name?: string; email?: string; message?: string;
+    };
 
-		if (!name || !email || !message) {
-			return NextResponse.json(
-				{ error: 'Missing required fields.' },
-				{ status: 400 }
-			);
-		}
+    const n = String(name ?? '').trim().slice(0, 120);
+    const e = String(email ?? '').trim().slice(0, 200);
+    const m = String(message ?? '').trim().slice(0, 5000);
 
-		if (!process.env.RESEND_API_KEY) {
-			return NextResponse.json(
-				{ error: 'Server email config missing: RESEND_API_KEY' },
-				{ status: 500 }
-			);
-		}
+    if (!n || !m || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(e)) {
+      return NextResponse.json({ error: 'invalid' }, { status: 400 });
+    }
 
-		if (!process.env.CONTACT_TO_EMAIL) {
-			return NextResponse.json(
-				{ error: 'Server email config missing: CONTACT_TO_EMAIL' },
-				{ status: 500 }
-			);
-		}
+    await resend.emails.send({
+      from: process.env.CONTACT_FROM!,          // e.g. site@yourdomain.com
+      to: process.env.CONTACT_TO!,              // eduardo.visconti.dev@gmail.com
+      replyTo: e,
+      subject: `Portfolio — ${n}`,
+      text: `From: ${n} <${e}>\n\n${m}`,
+    });
 
-		const resend = new Resend(process.env.RESEND_API_KEY); // ✅ aqui dentro
-
-		const from = process.env.CONTACT_FROM_EMAIL || 'onboarding@resend.dev';
-
-		const { error } = await resend.emails.send({
-			from,
-			to: [process.env.CONTACT_TO_EMAIL],
-			replyTo: email,
-			subject: `New portfolio contact from ${name}`,
-			text: `Name: ${name}\nEmail: ${email}\n\nMessage:\n${message}`
-		});
-
-		if (error) {
-			console.error('Resend error:', error);
-			return NextResponse.json(
-				{ error: 'Failed to send email.' },
-				{ status: 500 }
-			);
-		}
-
-		return NextResponse.json({ success: true }, { status: 200 });
-	} catch (err) {
-		console.error('Contact API error:', err);
-		return NextResponse.json(
-			{ error: 'Unexpected server error.' },
-			{ status: 500 }
-		);
-	}
+    return NextResponse.json({ ok: true });
+  } catch (err) {
+    console.error('[api/contact]', err);
+    return NextResponse.json({ error: 'send failed' }, { status: 502 });
+  }
 }

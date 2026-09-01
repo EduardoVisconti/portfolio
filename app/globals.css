@@ -1,29 +1,81 @@
+/* Only what cannot be a utility: resets, keyframes, scroll-driven reveals. */
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --background: #ffffff;
-  --foreground: #0a0a0a;
-  --muted: #737373;
-  --accent: #22c55e;
-  --accent-light: #dcfce7;
-  --accent-dark: #16a34a;
-  --border: #e5e5e5;
-  --card: #fafafa;
-}
+@layer base {
+  :root { --accent: #C7F94A; }
 
-body {
-  color: var(--foreground);
-  background: var(--background);
-}
+  html { scroll-behavior: smooth; }
 
-html {
-  scroll-behavior: smooth;
-}
-
-@layer utilities {
-  .text-balance {
-    text-wrap: balance;
+  body {
+    @apply bg-bg text-ink font-sans antialiased;
+    margin: 0;
   }
+
+  /* Users add links over time — never leave them browser-blue. */
+  a { color: inherit; text-decoration: none; transition: color .2s ease; }
+  a:hover { color: var(--accent); }
+
+  ::selection { background: var(--accent); color: #08090A; }
+
+  input::placeholder, textarea::placeholder { color: #6E747A; }
+
+  ::-webkit-scrollbar { width: 9px; height: 9px; }
+  ::-webkit-scrollbar-track { background: #08090A; }
+  ::-webkit-scrollbar-thumb { background: #22262A; border-radius: 0; }
+
+  /* iOS: 16px minimum stops zoom-on-focus */
+  input, textarea, select { font-size: 16px; }
+}
+
+@layer components {
+  /* ---- Scroll-driven reveal. See SPEC-motion.md §1. ---------------------- */
+  @keyframes rv     { from { opacity:0; transform: translateY(26px); } to { opacity:1; transform:none; } }
+  @keyframes heroIn { from { opacity:0; transform: translateY(30px); } to { opacity:1; transform:none; } }
+  @keyframes rvx    { from { opacity:0; transform: scaleX(0); }        to { opacity:1; transform: scaleX(1); } }
+  @keyframes fadeIn { from { opacity:0; }                              to { opacity:1; } }
+  @keyframes bar    { from { transform: scaleX(0); }                   to { transform: scaleX(1); } }
+  @keyframes prog   { from { transform: scaleX(0); }                   to { transform: scaleX(1); } }
+
+  /*
+   * Base state is VISIBLE. The animation only runs where the browser supports
+   * animation-timeline, so unsupported browsers get a static, fully readable
+   * page instead of content stuck at opacity 0.
+   */
+  .reveal { animation: rv linear both; animation-timeline: view(); animation-range: entry 0% cover 22%; }
+  .reveal-20 { animation-range: entry 0% cover 20%; }
+  .reveal-24 { animation-range: entry 0% cover 24%; }
+  .reveal-26 { animation-range: entry 0% cover 26%; }
+  .reveal-30 { animation-range: entry 0% cover 30%; }
+  .reveal-32 { animation-range: entry 0% cover 32%; }
+  .reveal-34 { animation-range: entry 2% cover 34%; }
+
+  @supports not (animation-timeline: view()) {
+    .reveal { animation: none; opacity: 1; transform: none; }
+  }
+
+  .bar-draw { transform-origin: 0 50%; animation: bar 1.2s cubic-bezier(.16,1,.3,1) both;
+              animation-timeline: view(); animation-range: entry 0% cover 32%; }
+  .bar-draw-slow { animation-duration: 1.4s; animation-range: entry 0% cover 30%; }
+
+  .scroll-progress { transform-origin: 0 50%; animation: prog linear both;
+                     animation-timeline: scroll(root); }
+
+  /* Only two breakpoint rules in the whole design. */
+  @media (max-width: 1420px) { [data-rail]   { display: none !important; } }
+  @media (max-width: 780px)  { [data-topnav] { display: none !important; } }
+
+  /* Tap targets: chips must clear 44px on phones. */
+  @media (max-width: 480px) { [data-chip] { padding-top: 13px; padding-bottom: 13px; } }
+
+  [data-motion="off"] *,
+  [data-motion="off"] *::before,
+  [data-motion="off"] *::after { animation: none !important; transition: none !important; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; }
+  html { scroll-behavior: auto; }
 }
