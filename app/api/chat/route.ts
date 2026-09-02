@@ -38,14 +38,21 @@ function overLimit(ip: string): boolean {
     dayCount = 0;
     hits.clear();
   }
-  if (++dayCount > DAY_MAX) return true;
 
   const now = Date.now();
   const recent = (hits.get(ip) ?? []).filter((t) => now - t < IP_WINDOW_MS);
+
+  // Per-IP first, and a request that is turned away spends neither budget.
+  // Counting the day before this check let one address burn the whole daily
+  // allowance on requests it was never going to be served - twenty answers
+  // for it, and 429 for every other visitor until midnight UTC.
   if (recent.length >= IP_MAX) {
     hits.set(ip, recent);
     return true;
   }
+  if (dayCount >= DAY_MAX) return true;
+
+  dayCount += 1;
   recent.push(now);
   hits.set(ip, recent);
 
