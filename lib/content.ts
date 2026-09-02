@@ -177,7 +177,7 @@ export const WORK: WorkItem[] = [
       { label: 'SOURCE ↗',    href: 'https://github.com/EduardoVisconti/leadflow', external: true },
     ],
     shots: [
-      { src: '/work/leadflow-1-dashboard.jpg', w: 1216, h: 760, alt: 'Pipeline dashboard: figures, recent deals and today's tasks' },
+      { src: '/work/leadflow-1-dashboard.jpg', w: 1216, h: 760, alt: 'Pipeline dashboard: figures, recent deals and open tasks' },
     ],
   },
 ];
