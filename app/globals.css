@@ -38,9 +38,9 @@
       135deg, theme('backgroundColor.rowhover') 0 1px, transparent 1px 6px);
   }
   .column-grid {
+    /* Six columns, a 1px rule at each boundary. Same geometry it had inline. */
     background-image: repeating-linear-gradient(
-      to right, transparent 0 calc(100% / 12 - 1px),
-      theme('borderColor.grid') calc(100% / 12 - 1px) calc(100% / 12));
+      90deg, theme('borderColor.grid') 0 1px, transparent 1px calc(100% / 6));
   }
 
   /* ---- Scroll-driven reveal. See SPEC-motion.md §1. ---------------------- */
