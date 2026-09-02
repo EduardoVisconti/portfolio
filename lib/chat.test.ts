@@ -8,7 +8,7 @@ test('a refused request spends neither budget', () => {
   // The bug this exists for: the daily counter used to be incremented before
   // the per-address check, so one caller could exhaust the day on requests it
   // was never served and 429 everyone else until midnight.
-  let t = Date.parse('2026-09-02T10:00:00Z');
+  const t = Date.parse('2026-09-02T10:00:00Z');
   const refuse = createRateLimiter({ ipWindowMs: HOUR, ipMax: 2, dayMax: 5, now: () => t });
 
   assert.equal(refuse('a'), null);
@@ -23,7 +23,7 @@ test('a refused request spends neither budget', () => {
 
 test('the two refusals are distinguishable', () => {
   // They have different remedies: one clears in an hour, the other at midnight.
-  let t = Date.parse('2026-09-02T10:00:00Z');
+  const t = Date.parse('2026-09-02T10:00:00Z');
   const refuse = createRateLimiter({ ipWindowMs: HOUR, ipMax: 1, dayMax: 1, now: () => t });
 
   assert.equal(refuse('a'), null);
