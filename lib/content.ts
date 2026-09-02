@@ -24,10 +24,10 @@ export const HERO = {
     'when an upstream source changes shape. Front-end is my favorite half of ' +
     'full-stack, so this page is a work sample too.',
   stats: [
-    { label: 'COMMITS',          value: 1271, suffix: '' },
-    { label: 'INTEGRATIONS',     value: 77,   suffix: '' },
-    { label: 'US COUNTIES',      value: 3000, suffix: '+' },
-    { label: 'DECISION RECORDS', value: 46,   suffix: '' },
+    { label: 'INTEGRATIONS',     value: 77,    suffix: '' },
+    { label: 'US COUNTIES',      value: 3000,  suffix: '+' },
+    { label: 'DECISION RECORDS', value: 46,    suffix: '' },
+    { label: 'LINES OF TESTS',   value: 68672, suffix: '' },
   ],
 } as const;
 
@@ -125,6 +125,21 @@ export const WORK: WorkItem[] = [
     },
   },
   {
+    title: 'AI Hub',
+    kicker: 'TEAM · IN PRODUCTION',
+    description:
+      'The internal multi-agent platform several departments run on. I build the ' +
+      'client: Next.js and React 19, a custom NDJSON streaming protocol, the state ' +
+      'architecture and the artifact rendering layer, against a Python/FastAPI/Agno ' +
+      'backend with role-based access and a retrieval pipeline. Shipped through ' +
+      'review by three engineers, on a suite of 1,300 unit and 200 end-to-end tests.',
+    meta: ['32 PULL REQUESTS', 'NDJSON STREAMING', 'NEXT.JS', 'FASTAPI'],
+    privateBadge: {
+      label: 'INTERNAL',
+      note: 'Company platform, so no link. Happy to walk through the streaming protocol live.',
+    },
+  },
+  {
     title: 'LeadFlow CRM',
     kicker: 'CLIENT PLATFORM · OPEN SOURCE',
     description:
@@ -177,13 +192,13 @@ export const CONTACT = {
 } as const;
 
 export const SECTIONS = [
-  { n: '01', id: 'top',      title: 'Hero',            aside: null,                        nav: false },
-  { n: '02', id: 'numbers',  title: 'The Numbers',     aside: 'ALL VERIFIED · ALL MINE',    nav: true  },
+  { n: '01', id: 'top',      title: 'Hero',            aside: null,                         nav: false },
+  { n: '02', id: 'work',     title: 'Work',            aside: 'SELECTED · 2024 — 2026',     nav: true  },
   { n: '03', id: 'thinking', title: 'How I Think',     aside: '3 DECISIONS FROM PRODUCTION', nav: true },
-  { n: '04', id: 'work',     title: 'Work',            aside: 'SELECTED · 2024 — 2026',     nav: true  },
+  { n: '04', id: 'numbers',  title: 'The Numbers',     aside: 'ALL VERIFIED',               nav: true  },
   { n: '05', id: 'stack',    title: 'Stack',           aside: 'BY LAYER, NOT BY LOGO',      nav: false },
   { n: '06', id: 'ask',      title: 'Ask Me Anything', aside: 'LIVE · /api/chat',           nav: true  },
-  { n: '07', id: 'contact',  title: 'Contact',         aside: 'RESEND · REPLIES FROM ME',   nav: false },
+  { n: '07', id: 'contact',  title: 'Contact',         aside: 'DIRECT · I ANSWER',          nav: false },
 ] as const;
 
 export const FOOTER = {

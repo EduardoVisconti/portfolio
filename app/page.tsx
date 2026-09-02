@@ -21,9 +21,9 @@ export default function Page() {
 
       <main className="relative z-[1] mx-auto max-w-container px-gutter">
         <Hero />
-        <Numbers />
-        <Thinking />
         <Work />
+        <Thinking />
+        <Numbers />
         <Stack />
         <AskMeAnything />
         <Contact />

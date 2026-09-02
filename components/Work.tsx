@@ -15,7 +15,7 @@ export function Work() {
   return (
     <section id="work" data-screen-label="04 Work" className="py-section">
       <div className="mb-[clamp(30px,4vw,48px)]">
-        <SectionHeader n="04" title="Work" aside="SELECTED · 2024 — 2026" />
+        <SectionHeader n="02" title="Work" aside="SELECTED · 2024 — 2026" />
       </div>
 
       {WORK.map((item, i) => (

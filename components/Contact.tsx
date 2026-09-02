@@ -15,7 +15,7 @@ export function Contact() {
   return (
     <section id="contact" className="pb-section-end pt-section">
       <div className="mb-[clamp(40px,5vw,64px)]">
-        <SectionHeader n="07" title="Contact" aside="NOT LOOKING · I READ EVERYTHING" />
+        <SectionHeader n="07" title="Contact" aside="DIRECT · I ANSWER" />
       </div>
 
       <Reveal range={24} className="flex flex-wrap items-start gap-[clamp(44px,6vw,96px)]">

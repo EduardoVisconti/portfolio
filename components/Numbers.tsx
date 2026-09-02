@@ -9,7 +9,7 @@ export function Numbers() {
   return (
     <section id="numbers" data-screen-label="02 The Numbers" className="py-section">
       <div className="mb-[clamp(44px,6vw,76px)]">
-        <SectionHeader n="02" title="The Numbers" aside="ALL VERIFIED · ALL MINE" />
+        <SectionHeader n="04" title="The Numbers" aside="ALL VERIFIED · ALL MINE" />
       </div>
 
       <Reveal range={26} className="flex flex-wrap items-end gap-[clamp(36px,5vw,72px)]">
