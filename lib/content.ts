@@ -135,7 +135,7 @@ export const WORK: WorkItem[] = [
   },
   {
     title: 'Deed Retrieval Platform',
-    period: 'APR 2026 — NOW · 14 MONTHS',
+    period: 'APR 2026 — NOW',
     kicker: 'SOLE ENGINEER · PRODUCTION',
     description:
       'An agent-driven retrieval system running against 77 county and vendor portals ' +

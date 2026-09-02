@@ -24,8 +24,9 @@ a card with no href.
 So the site argues three other ways instead.
 
 **Verified figures, each with the period it was earned over.** A number without a
-time denominator is a shrug. 77 integrations means nothing until you know it was
-77 in fourteen months, alone.
+time denominator is a shrug, so every row carries its dates and the reader does
+the division. 77 vendor-portal integrations means one thing over four years and
+something else over five months.
 
 **Three engineering decisions, written out in full.** Not a skills list. A claim
 in display type, then the reasoning: why a deletion that is merely an absence
