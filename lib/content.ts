@@ -174,13 +174,7 @@ export const CONTACT = {
   support:
     "If it has an agent in the runtime and a real failure budget, I'll have opinions " +
     'before the call ends.',
-  success: '✓ QUEUED — I REPLY WITHIN A DAY',
-  errors: {
-    name: 'NAME REQUIRED',
-    email: 'VALID EMAIL REQUIRED',
-    message: 'MESSAGE REQUIRED',
-    send: "COULDN'T SEND — TRY eduardo.visconti.dev@gmail.com",
-  },
+  note: 'Not looking right now, but I read everything and I answer.',
 } as const;
 
 export const SECTIONS = [

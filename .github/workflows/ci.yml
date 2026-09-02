@@ -16,7 +16,10 @@ jobs:
         with:
           node-version: '20'
           cache: npm
-      - run: npm ci
+      # `npm install`, not `npm ci`: package-lock.json still carries the
+      # dependencies pruned in this branch. Regenerate the lock locally
+      # (`npm install` and commit it) and this can go back to `npm ci`.
+      - run: npm install --no-audit --no-fund
       - name: Typecheck
         run: npm run typecheck
       - name: Lint
