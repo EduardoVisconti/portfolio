@@ -38,7 +38,11 @@ function watch(fn: () => void) {
     window.addEventListener('scroll', all, { passive: true, capture: true });
     window.addEventListener('resize', all);
   }
-  return () => watchers.delete(fn);
+  // Returns void, not Set.delete's boolean: React's effect destructor is
+  // typed to return nothing.
+  return () => {
+    watchers.delete(fn);
+  };
 }
 
 export function Counter({
