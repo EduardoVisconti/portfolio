@@ -1,10 +1,14 @@
 /**
- * The two pieces of /api/chat that are logic rather than plumbing, lifted out
- * so they can be tested without standing up a route or calling Gemini.
+ * The parts of /api/chat that are logic rather than plumbing, lifted out so
+ * they can be tested without standing up a route or calling Gemini.
  */
 
 export type Msg = { role: 'user' | 'assistant'; content: string };
 export type GeminiTurn = { role: 'user' | 'model'; parts: { text: string }[] };
+
+/** Why a request was refused. The two have different remedies, so they are
+ *  different answers - one clears in an hour, the other at midnight UTC. */
+export type Refusal = 'ip' | 'day' | null;
 
 const dayKey = (t: number) => new Date(t).toISOString().slice(0, 10);
 
@@ -34,35 +38,45 @@ export function createRateLimiter({ ipWindowMs, ipMax, dayMax, now = Date.now }:
   let day = dayKey(now());
   let dayCount = 0;
 
-  return function overLimit(ip: string): boolean {
+  return function refuse(ip: string): Refusal {
     const t = now();
     const today = dayKey(t);
     if (today !== day) {
       day = today;
       dayCount = 0;
-      hits.clear();
+      // Deliberately not clearing `hits`: the per-address window is time-based
+      // and expires itself below. Clearing it handed anyone who spent their
+      // twenty questions at 23:58 another twenty at 00:01.
     }
 
     const recent = (hits.get(ip) ?? []).filter((x) => t - x < ipWindowMs);
 
     if (recent.length >= ipMax) {
       hits.set(ip, recent);
-      return true;
+      return 'ip';
     }
-    if (dayCount >= dayMax) return true;
+    if (dayCount >= dayMax) return 'day';
 
     dayCount += 1;
     recent.push(t);
     hits.set(ip, recent);
-    return false;
+
+    // `hits` only grows on a served request, so it is bounded by dayMax per
+    // day; this prunes addresses whose window has fully aged out.
+    if (hits.size > dayMax) {
+      for (const [k, v] of hits) if (!v.some((x) => t - x < ipWindowMs)) hits.delete(k);
+    }
+    return null;
   };
 }
 
 /**
- * Gemini takes the history separately from the message being answered, and a
- * history must open on a user turn. Trimming to the last N exchanges can cut
- * mid-pair and leave an assistant turn first, so the leading turns are dropped
- * until one opens correctly.
+ * Gemini takes the history separately from the message being answered, and
+ * rejects a history that does not strictly alternate user/model. Two things can
+ * break that: trimming to the last N exchanges can cut mid-pair and leave a
+ * model turn first, and dropping empty messages can leave two same-role turns
+ * adjacent. The SDK throws inside the ChatSession constructor when either
+ * happens, which surfaces to the visitor as "the route isn't reachable".
  */
 export function toGeminiHistory(
   messages: Msg[],
@@ -77,7 +91,17 @@ export function toGeminiHistory(
     .filter((m) => m.parts[0].text.length > 0);
 
   const latest = turns.pop();
-  while (turns.length && turns[0].role !== 'user') turns.shift();
 
-  return { history: turns, latest };
+  // Keep only the last of any same-role run, then drop leading model turns.
+  const alternating: GeminiTurn[] = [];
+  for (const turn of turns) {
+    if (alternating.length && alternating[alternating.length - 1].role === turn.role) {
+      alternating[alternating.length - 1] = turn;
+    } else {
+      alternating.push(turn);
+    }
+  }
+  while (alternating.length && alternating[0].role !== 'user') alternating.shift();
+
+  return { history: alternating, latest };
 }

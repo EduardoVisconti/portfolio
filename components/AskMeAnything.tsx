@@ -14,6 +14,10 @@ type Msg = { role: 'user' | 'assistant'; content: string };
  */
 export function AskMeAnything() {
   const [messages, setMessages] = useState<Msg[]>([]);
+  // Only real answers go here. Error copy is shown in the transcript but must
+  // never be replayed to the model as something the model said - it will build
+  // on "come back in an hour" as if it had written it.
+  const sent = useRef<Msg[]>([]);
   const [busy, setBusy] = useState(false);
   const [latency, setLatency] = useState<number | null>(null);
   const [turns, setTurns] = useState(0);
@@ -31,12 +35,13 @@ export function AskMeAnything() {
     if (!text || busy) return;
     if (inputRef.current) inputRef.current.value = '';
 
-    const history = messages;
+    const history = sent.current;
     setMessages((m) => [...m, { role: 'user', content: text }]);
     setBusy(true);
 
     const t0 = performance.now();
     let reply = ASK.fallback;
+    let answered = false;
     try {
       const res = await fetch('/api/chat', {
         method: 'POST',
@@ -45,10 +50,15 @@ export function AskMeAnything() {
       });
       if (res.ok) {
         const data = await res.json();
-        if (typeof data?.reply === 'string' && data.reply.trim()) reply = data.reply.trim();
+        if (typeof data?.reply === 'string' && data.reply.trim()) {
+          reply = data.reply.trim();
+          answered = true;
+        }
       } else if (res.status === 429) {
-        // The guard is doing its job; saying "unreachable" would be a lie.
-        reply = ASK.rateLimited;
+        // The guard is doing its job; saying "unreachable" would be a lie. The
+        // two limits clear at different times, so they get different answers.
+        const data = await res.json().catch(() => null);
+        reply = data?.error === 'daily_limit' ? ASK.dailyLimit : ASK.rateLimited;
       } else if (res.status === 503) {
         reply = ASK.unconfigured;
       }
@@ -57,6 +67,9 @@ export function AskMeAnything() {
     }
 
     setLatency(Math.round(performance.now() - t0));
+    if (answered) {
+      sent.current = [...history, { role: 'user', content: text }, { role: 'assistant', content: reply }];
+    }
     setMessages((m) => [...m, { role: 'assistant', content: reply }]);
     setTurns((t) => t + 1);
     setBusy(false);

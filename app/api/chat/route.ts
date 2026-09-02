@@ -17,7 +17,7 @@ const MAX_CHARS = 1200;        // per-message input cap
 
 // Public and unauthenticated, so it needs a ceiling. Logic and tests live in
 // lib/chat.ts - the numbers are the only part that belongs here.
-const overLimit = createRateLimiter({
+const refuse = createRateLimiter({
   ipWindowMs: 60 * 60 * 1000,
   ipMax: 20,
   dayMax: 500,
@@ -31,8 +31,11 @@ export async function POST(req: Request) {
 
   try {
     const ip = req.headers.get('x-forwarded-for')?.split(',')[0].trim() ?? 'unknown';
-    if (overLimit(ip)) {
-      return NextResponse.json({ error: 'rate_limited' }, { status: 429 });
+    const refusal = refuse(ip);
+    if (refusal) {
+      // Two different remedies, so two different answers.
+      return NextResponse.json({ error: refusal === 'ip' ? 'rate_limited' : 'daily_limit' },
+        { status: 429 });
     }
 
     const body = (await req.json()) as { messages?: Msg[] };
@@ -48,12 +51,29 @@ export async function POST(req: Request) {
     const model = new GoogleGenerativeAI(key).getGenerativeModel({
       model: MODEL,
       systemInstruction: ASSISTANT_CONTEXT,
-      generationConfig: { maxOutputTokens: 600, temperature: 0.4 },
+      generationConfig: {
+        // Thinking is on by default on 2.5 Flash and its tokens are billed
+        // against maxOutputTokens. Left alone, the model can spend the whole
+        // budget reasoning and return MAX_TOKENS with no text - a 200 carrying
+        // an empty string, which the console then reports as an outage. The
+        // answers here are 2-5 sentences; there is nothing to think about.
+        thinkingConfig: { thinkingBudget: 0 },
+        maxOutputTokens: 1200,
+        temperature: 0.4,
+      },
     });
 
     const chat = model.startChat({ history });
     const result = await chat.sendMessage(latest.parts[0].text);
     const reply = result.response.text().trim();
+
+    // An empty body is a failure, not an answer. Returning 200 with '' makes
+    // the client fall back while the telemetry beside it reports a healthy
+    // round trip.
+    if (!reply) {
+      console.error('[api/chat] empty reply', result.response.candidates?.[0]?.finishReason);
+      return NextResponse.json({ error: 'empty' }, { status: 502 });
+    }
 
     return NextResponse.json({ reply });
   } catch (err) {

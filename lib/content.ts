@@ -232,6 +232,9 @@ export const ASK = {
   rateLimited:
     'That is the hourly limit for one visitor. It exists so a script cannot spend ' +
     'the budget. Come back in an hour, or email eduardo.visconti.dev@gmail.com.',
+  dailyLimit:
+    'That is the whole allowance for today, across every visitor. It resets at ' +
+    'midnight UTC. eduardo.visconti.dev@gmail.com does not have a quota.',
   unconfigured:
     'This console is not wired to a key right now. ' +
     'eduardo.visconti.dev@gmail.com reaches me directly.',
