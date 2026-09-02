@@ -1,3 +1,4 @@
+import { Analytics } from '@vercel/analytics/next';
 import type { Metadata } from 'next';
 import { IBM_Plex_Mono, Instrument_Sans, Instrument_Serif } from 'next/font/google';
 import './globals.css';
@@ -69,6 +70,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           }}
         />
         {children}
+        {/* Passive search means the useful question is which post sent someone
+            and where they stopped reading, not how many hits there were. */}
+        <Analytics />
       </body>
     </html>
   );
