@@ -88,6 +88,8 @@ export type WorkItem = {
   meta: string[];
   links?: { label: string; href: string; external?: boolean }[];
   privateBadge?: { label: string; note: string };
+  /** Normalised to a common height, so a phone and a desktop sit in one band. */
+  shots?: { src: string; w: number; h: number; alt: string }[];
 };
 
 export const WORK: WorkItem[] = [
@@ -108,6 +110,12 @@ export const WORK: WorkItem[] = [
         href: 'https://github.com/EduardoVisconti/forja-case-study',
         external: true,
       },
+    ],
+    shots: [
+      { src: '/work/forja-1-runner.jpg', w: 349, h: 760, alt: 'Guided session: exercise, set, rest timer, next' },
+      { src: '/work/forja-2-summary.jpg', w: 349, h: 760, alt: 'Session summary with volume, sets and personal records' },
+      { src: '/work/forja-3-progress.jpg', w: 349, h: 760, alt: 'Monthly progress calendar and cardio trends' },
+      { src: '/work/forja-4-habits.jpg', w: 349, h: 760, alt: 'Daily habit protocol with streaks' },
     ],
   },
   {
@@ -140,6 +148,23 @@ export const WORK: WorkItem[] = [
     },
   },
   {
+    title: 'Sueli Repulho',
+    kicker: 'CLIENT WORK · SHIPPED',
+    description:
+      'Practice site and the subscription product beside it, for a clinical ' +
+      'psychologist with 42 years of practice. Two registers on one type system: a ' +
+      'warm editorial site built to convert, and a dark, quiet product for writing ' +
+      'in. Design, build and delivery were all mine.',
+    meta: ['ASTRO', 'DESIGN SYSTEM', 'SEO-FIRST', 'CI SECURITY GATES'],
+    links: [
+      { label: 'LIVE SITE ↗', href: 'https://suelirepulho.com.br', external: true },
+    ],
+    shots: [
+      { src: '/work/sueli-1-home.jpg', w: 1216, h: 760, alt: 'Practice home page, built for conversion' },
+      { src: '/work/sueli-2-app.jpg', w: 1216, h: 760, alt: 'ConsciencIA: the subscription product, same type system inverted' },
+    ],
+  },
+  {
     title: 'LeadFlow CRM',
     kicker: 'CLIENT PLATFORM · OPEN SOURCE',
     description:
@@ -150,6 +175,9 @@ export const WORK: WorkItem[] = [
     links: [
       { label: 'LIVE DEMO ↗', href: 'https://leadflow-electronics.vercel.app', external: true },
       { label: 'SOURCE ↗',    href: 'https://github.com/EduardoVisconti/leadflow', external: true },
+    ],
+    shots: [
+      { src: '/work/leadflow-1-dashboard.jpg', w: 1216, h: 760, alt: 'Pipeline dashboard: figures, recent deals and today's tasks' },
     ],
   },
 ];

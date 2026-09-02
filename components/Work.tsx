@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import { WORK } from '@/lib/content';
 import { Reveal } from './Reveal';
 import { SectionHeader } from './SectionHeader';
@@ -83,6 +84,26 @@ export function Work() {
               </>
             ) : null}
           </div>
+
+          {/* Screens sit on a hairline, at one shared height: a phone and a
+              desktop capture then read as one band instead of fighting. */}
+          {item.shots?.length ? (
+            <div className="-mx-5 w-full overflow-x-auto px-5 pt-2">
+              <div className="flex w-max gap-3">
+                {item.shots.map((s) => (
+                  <Image
+                    key={s.src}
+                    src={s.src}
+                    alt={s.alt}
+                    width={s.w}
+                    height={s.h}
+                    sizes="(max-width: 780px) 60vw, 40vw"
+                    className="h-[clamp(180px,21vw,290px)] w-auto border border-panel"
+                  />
+                ))}
+              </div>
+            </div>
+          ) : null}
         </Reveal>
       ))}
     </section>
