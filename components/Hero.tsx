@@ -41,7 +41,7 @@ export function Hero() {
       </h1>
 
       <div
-        className="h-px origin-left bg-[rgba(255,255,255,.12)] my-[clamp(26px,3vw,36px)] mt-[clamp(32px,4vw,52px)]"
+        className="h-px origin-left bg-hero my-[clamp(26px,3vw,36px)] mt-[clamp(32px,4vw,52px)]"
         style={{ animation: `rvx .9s ${ease} .5s both` }}
         aria-hidden
       />

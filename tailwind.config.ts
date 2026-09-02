@@ -34,6 +34,7 @@ const config: Config = {
         soft: 'rgba(255,255,255,.07)',
         panel: 'rgba(255,255,255,.08)',
         rule: 'rgba(255,255,255,.09)',
+        hero: 'rgba(255,255,255,.12)',
         strong: 'rgba(255,255,255,.11)',
         hero: 'rgba(255,255,255,.12)',
         field: 'rgba(255,255,255,.13)',

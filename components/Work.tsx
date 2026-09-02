@@ -73,11 +73,7 @@ export function Work() {
                 {/* The design's answer to "my best work is private": reads as
                     redacted without a lock icon or a blurred fake screenshot. */}
                 <span
-                  className="inline-flex items-center gap-[9px] border border-chip px-[14px] py-[9px] font-mono text-m-10 font-medium tracking-t7 text-ink-muted"
-                  style={{
-                    backgroundImage:
-                      'repeating-linear-gradient(135deg, rgba(255,255,255,.05) 0 1px, transparent 1px 6px)',
-                  }}
+                  className="hatch inline-flex items-center gap-[9px] border border-chip px-[14px] py-[9px] font-mono text-m-10 font-medium tracking-t7 text-ink-muted"
                 >
                   {item.privateBadge.label}
                 </span>

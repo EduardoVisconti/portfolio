@@ -18,19 +18,31 @@
   a { color: inherit; text-decoration: none; transition: color .2s ease; }
   a:hover { color: var(--accent); }
 
-  ::selection { background: var(--accent); color: #08090A; }
+  ::selection { background: var(--accent); color: theme('colors.bg'); }
 
-  input::placeholder, textarea::placeholder { color: #6E747A; }
+  input::placeholder, textarea::placeholder { color: theme('colors.ink.idle'); }
 
   ::-webkit-scrollbar { width: 9px; height: 9px; }
-  ::-webkit-scrollbar-track { background: #08090A; }
-  ::-webkit-scrollbar-thumb { background: #22262A; border-radius: 0; }
+  ::-webkit-scrollbar-track { background: theme('colors.bg'); }
+  ::-webkit-scrollbar-thumb { background: theme('colors.ink.separator'); border-radius: 0; }
 
   /* iOS: 16px minimum stops zoom-on-focus */
   input, textarea, select { font-size: 16px; }
 }
 
 @layer components {
+  /* The two gradients the design uses. They live here rather than inline in a
+     component so every colour in the palette resolves through the config. */
+  .hatch {
+    background-image: repeating-linear-gradient(
+      135deg, theme('backgroundColor.rowhover') 0 1px, transparent 1px 6px);
+  }
+  .column-grid {
+    background-image: repeating-linear-gradient(
+      to right, transparent 0 calc(100% / 12 - 1px),
+      theme('borderColor.grid') calc(100% / 12 - 1px) calc(100% / 12));
+  }
+
   /* ---- Scroll-driven reveal. See SPEC-motion.md §1. ---------------------- */
   @keyframes rv     { from { opacity:0; transform: translateY(26px); } to { opacity:1; transform:none; } }
   @keyframes heroIn { from { opacity:0; transform: translateY(30px); } to { opacity:1; transform:none; } }
