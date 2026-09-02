@@ -1,75 +1,185 @@
+![Eduardo Visconti — AI Engineer, Full-Stack](docs/site.jpg)
+
 # eduardo-visconti.vercel.app
 
-Personal site of an AI engineer in Tampa, FL. One scrolling page, seven
-anchored sections.
+**The personal site of an AI engineer, built around the fact that his best work
+cannot be shown.**
 
-It is built around a constraint: **the strongest work on it is private.** There
-is no repo and no source to show for the flagship platform, so the page cannot
-be a grid of project links. It argues three other ways instead - verified
-figures with the period they were earned over, three engineering decisions
-written out in full, and the things a visitor can open and use: the live apps,
-and a console that answers questions about the owner.
+[![CI](https://github.com/EduardoVisconti/portfolio/actions/workflows/ci.yml/badge.svg)](https://github.com/EduardoVisconti/portfolio/actions/workflows/ci.yml)
+![Next.js 15](https://img.shields.io/badge/Next.js-15-000)
+![React 19](https://img.shields.io/badge/React-19-000)
+![TypeScript strict](https://img.shields.io/badge/TypeScript-strict-000)
 
-## Stack
+**[Live site →](https://eduardo-visconti.vercel.app)**
 
-Next.js 15 (App Router), React 19, TypeScript, Tailwind CSS.
+---
 
-Scroll reveals are pure CSS via `animation-timeline`, so the page's motion ships
-**zero JavaScript** and degrades to a fully readable page without it. Three
-components hold state and are therefore client components - `Counter`,
-`SectionRail`, `AskMeAnything`. Everything else renders on the server.
+## Why this exists, and why it looks like this
 
-## The two routes
+Most portfolios are a grid of project cards. That format assumes the work can be
+linked to. Here it mostly cannot: the flagship is a production platform whose
+source is private, so a link grid would leave the strongest thing on the page as
+a card with no href.
 
-`/api/chat` backs the Ask Me Anything console. It runs on **Gemini**, on the
-free tier, because the site has to work without a paid API account. The system
-prompt is `lib/assistant-context.ts`. The route is public and unauthenticated,
-so it carries a per-IP window and a daily ceiling; both are per-instance and
-therefore soft, and the edge is the real place for a hard limit.
+So the site argues three other ways instead.
 
-There is no contact route. Delivering mail needs a verified sending domain and
-this site does not own one, so section 07 is an email address and two links
-rather than a form that fails silently.
+**Verified figures, each with the period it was earned over.** A number without a
+time denominator is a shrug. 77 integrations means nothing until you know it was
+77 in fourteen months, alone.
 
-## Content
+**Three engineering decisions, written out in full.** Not a skills list. A claim
+in display type, then the reasoning: why a deletion that is merely an absence
+resurrects on the next sync, why a suite running in UTC cannot see
+off-by-one-day bugs, why a layer rule that CI does not enforce is gone within a
+month.
 
-Every figure and every string lives in `lib/content.ts`. Adding work over the
-years means appending to `WORK` - the ledger layout follows without a redesign.
+**The things a visitor can actually open.** Live apps, screens of real
+interfaces, and a console that answers questions about the owner, backed by a
+real model rather than a canned FAQ.
 
-Figures are stated as fact, so a stale one is a wrong one. `lib/content.ts` and
-`lib/assistant-context.ts` must agree, or the assistant will contradict the page
-out loud. That pairing is checked, not remembered - see below.
+---
 
-A scheduled workflow opens an issue on the 3rd of each month to re-derive the
-numbers, because they drift silently.
+## Architecture
 
-## Gates
+```mermaid
+flowchart TD
+    subgraph static["Static · ships zero JavaScript"]
+        page["app/page.tsx<br/>seven sections"]
+        reveal["Reveal<br/>CSS animation-timeline"]
+        content["lib/content.ts<br/>every figure and string"]
+    end
 
-```bash
-npm run invariants   # the design rules, enforced
-npm run typecheck
-npm run lint
-npm run build
+    subgraph client["Client components · the only three that hold state"]
+        counter["Counter<br/>rAF, authored numeral first"]
+        rail["SectionRail<br/>scroll position"]
+        ask["AskMeAnything<br/>transcript, latency"]
+    end
+
+    subgraph edge["Edge"]
+        chat["/api/chat<br/>per-IP + daily guard"]
+        og["opengraph-image<br/>generated per request"]
+    end
+
+    gemini["Gemini API<br/>free tier"]
+    ctx["lib/assistant-context.ts<br/>system prompt"]
+
+    content --> page
+    content --> counter
+    page --> reveal
+    page --> client
+    ask --> chat
+    chat --> gemini
+    ctx --> chat
+    content -. "figures must agree<br/>enforced by npm run invariants" .-> ctx
 ```
 
-CI runs those on every pull request, plus a secret scan (gitleaks), a dependency
-audit (osv-scanner) and a link check over every external URL the page claims.
-`CONTRIBUTING.md` lists the invariants and why each one exists.
+The dotted edge is the one that bites. Every figure on the page is stated as
+fact, and the assistant states the same figures out loud to strangers. If one
+changes in `lib/content.ts` and not in `lib/assistant-context.ts`, the assistant
+contradicts the page with confidence. That pairing is checked mechanically
+rather than remembered.
 
-## Local
+---
+
+## How it works
+
+**Content is data, not markup.** Every figure, every string and every work item
+lives in `lib/content.ts`. Adding a project over the years is one appended
+object, and the ledger layout absorbs it without a redesign. That is the whole
+reason it is a ledger and not a card grid.
+
+**Motion ships no JavaScript.** Scroll reveals use CSS `animation-timeline:
+view()`, with an `@supports not` fallback that leaves content visible rather than
+stranded at `opacity: 0`. Exactly three components are client components, and
+the build fails if a fourth appears.
+
+**Numbers render before they animate.** `Counter` puts the authored numeral in
+the DOM as real text and swaps it only once the animation actually begins, so a
+failed visibility check can never leave a headline figure blank. There is
+deliberately no timeout backstop: a timer armed on mount fires for every counter
+still below the fold and marks it started, disabling the animation it was meant
+to protect.
+
+**The console is real.** `/api/chat` runs on Gemini's free tier, because the site
+has to work without a paid API account. The route is public and unauthenticated,
+so it carries a per-IP sliding window and a daily ceiling, and a request that is
+turned away spends neither budget. Both counters are per-instance and therefore
+soft; a hard limit belongs at the edge.
+
+**There is no contact form.** Delivering mail needs a verified sending domain and
+this site does not own one. A form that fails silently is worse than a link that
+works, so section 07 is an email address and two links.
+
+---
+
+## Getting started
 
 ```bash
 npm ci
-cp .env.example .env.local   # GEMINI_API_KEY, free at aistudio.google.com/apikey
+cp .env.example .env.local   # GEMINI_API_KEY — free, no card, aistudio.google.com/apikey
 npm run dev
 ```
 
-Without the key the console returns 503 and the client says so plainly instead
-of pretending to be live.
+Without the key the console returns `503` and says so plainly rather than
+pretending to be live.
 
-## Design
+| Command | What it does |
+| --- | --- |
+| `npm run dev` | Development server |
+| `npm run invariants` | The design rules, enforced |
+| `npm run typecheck` | `tsc --noEmit` |
+| `npm run lint` | `next lint` |
+| `npm run build` | Production build |
 
-Zero border-radius and zero box-shadow, everywhere, deliberately. Structure
-comes from 1px hairlines rather than cards. One accent, used for data and state
-only. Instrument Serif at display sizes, IBM Plex Mono for every figure and
-label. Tokens live in `tailwind.config.ts` and nowhere else.
+---
+
+## Gates
+
+Every pull request runs, and must pass:
+
+- **invariants** — the rules in [`CONTRIBUTING.md`](CONTRIBUTING.md), as a script
+- **typecheck, lint, build**
+- **gitleaks** — secret scan over full history
+- **osv-scanner** — dependency advisories
+- **lychee** — every external URL the page claims still resolves
+
+The last one earns its place: every claim here is a link out, a 404 costs more
+than a lint error, and nothing else in the pipeline would catch it.
+
+A scheduled workflow opens an issue on the 3rd of each month to re-derive the
+figures. They go stale silently, and a stale number stated as fact is a wrong
+one.
+
+---
+
+## Project layout
+
+```
+app/
+  page.tsx              seven sections, in order
+  layout.tsx            fonts, metadata, JSON-LD
+  opengraph-image.tsx   share card, generated at the edge
+  robots.ts sitemap.ts
+  api/chat/route.ts     the console, with its rate guard
+components/             fifteen; three hold state
+lib/
+  content.ts            single source of truth for every figure and string
+  assistant-context.ts  the assistant's system prompt, mirrors content.ts
+scripts/invariants.mjs  the gate
+public/
+  work/                 interface screens
+  resume.pdf  llms.txt
+```
+
+---
+
+## Contributing
+
+One person maintains this, so [`CONTRIBUTING.md`](CONTRIBUTING.md) is short and
+covers only the rules whose violation is expensive and silent. If you disagree
+with a rule, change the rule and its check together. A rule that lives only in
+prose is a rule that decays, which is the argument the site itself makes.
+
+## License
+
+No licence. All rights reserved — this is a personal site, not a template.
