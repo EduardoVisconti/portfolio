@@ -61,9 +61,13 @@ export const NUMBERS = {
   ],
 } as const;
 
+/** Each decision names the project it came from. The section offers them
+  * instead of the private work, and all three are in fact from Forja - which
+  * anyone who opens the case study will notice. Better to say it. */
 export const THINKING = [
   {
     n: '01',
+    project: 'FORJA',
     category: 'SYNC · CONSISTENCY',
     claim: 'Deletions sync as tombstones, under the same last-write-wins rule as any write.',
     because:
@@ -73,6 +77,7 @@ export const THINKING = [
   },
   {
     n: '02',
+    project: 'FORJA',
     category: 'TIME · TEST DESIGN',
     claim: 'Date-sensitive tests run in a non-UTC timezone. Always.',
     because:
@@ -83,6 +88,7 @@ export const THINKING = [
   },
   {
     n: '03',
+    project: 'FORJA',
     category: 'STRUCTURE · CI',
     claim: 'Layer boundaries are enforced by a CI gate that fails the pull request.',
     because:

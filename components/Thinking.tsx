@@ -36,7 +36,7 @@ export function Thinking() {
             <span className="font-mono text-m-11 font-medium tracking-t7 text-accent">
               ADR — {adr.n}
             </span>
-            <span className="font-mono text-m-11 tracking-t7 text-ink-label">{adr.category}</span>
+            <span className="font-mono text-m-11 tracking-t7 text-ink-label">{adr.project} · {adr.category}</span>
           </div>
 
           <div className="max-w-[760px] flex-[1_1_480px]">

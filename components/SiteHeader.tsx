@@ -28,6 +28,27 @@ export function SiteHeader() {
           ))}
         </nav>
 
+      {/* Below 780px the full nav hides and, until now, nothing replaced it:
+          a seven-section long-scroll page with no way through it but the
+          scrollbar - on the width where a shared link actually gets opened.
+          Numbers only, no drawer, no JavaScript. */}
+      <nav
+        data-mobilenav
+        aria-label="Sections"
+        className="ml-auto hidden items-center gap-[14px] max-[780px]:flex"
+      >
+        {SECTIONS.filter((s) => s.nav).map((s) => (
+          <a
+            key={s.id}
+            href={`#${s.id}`}
+            aria-label={`${s.n} ${s.title}`}
+            className="font-mono text-m-11 tracking-t6 text-ink-muted transition-colors hover:text-accent"
+          >
+            {s.n}
+          </a>
+        ))}
+      </nav>
+
         <a
           href="#contact"
           className="inline-flex h-[30px] items-center gap-[9px] border border-link px-[15px] font-mono text-m-11 font-medium tracking-t6 text-ink transition-colors hover:border-accent hover:text-accent"

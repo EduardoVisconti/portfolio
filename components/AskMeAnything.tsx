@@ -104,7 +104,7 @@ export function AskMeAnything() {
           <span className="font-mono text-m-10 font-medium tracking-t8 text-ink-muted">
             EV · ASSISTANT
           </span>
-          <span className="ml-auto font-mono text-m-10 tracking-t6 text-ink-faint" aria-live="polite">
+          <span className="ml-auto font-mono text-m-10 tracking-t6 text-ink-faint">
             {status}
           </span>
         </div>
@@ -112,6 +112,9 @@ export function AskMeAnything() {
         {/* transcript */}
         <div
           ref={scrollRef}
+          role="log"
+          aria-live="polite"
+          aria-label="Conversation"
           className="max-h-[420px] min-h-[280px] overflow-y-auto p-[clamp(22px,3vw,36px)]"
         >
           {messages.length === 0 ? (

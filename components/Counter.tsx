@@ -19,6 +19,28 @@ const easeOutCubic = (p: number) => 1 - Math.pow(1 - p, 3);
  * scroll handler behave predictably inside transformed / container-query
  * ancestors, where observers can silently never fire.
  */
+/**
+ * One listener for every counter on the page, not one each.
+ *
+ * Eleven instances mount here; eleven `scroll` handlers each reading layout was
+ * eleven forced reflows per event on the first pass down the page. The set
+ * empties itself as counters fire, and the listener is removed with the last
+ * one.
+ */
+const watchers = new Set<() => void>();
+let listening = false;
+
+function watch(fn: () => void) {
+  watchers.add(fn);
+  if (!listening) {
+    listening = true;
+    const all = () => watchers.forEach((w) => w());
+    window.addEventListener('scroll', all, { passive: true, capture: true });
+    window.addEventListener('resize', all);
+  }
+  return () => watchers.delete(fn);
+}
+
 export function Counter({
   value, suffix = '', className = '',
 }: { value: number; suffix?: string; className?: string }) {
@@ -53,13 +75,12 @@ export function Counter({
     };
 
     tick();
-    window.addEventListener('scroll', tick, { passive: true, capture: true });
-    window.addEventListener('resize', tick);
+    const unwatch = watch(() => {
+      tick();
+      if (started.current) unwatch();
+    });
 
-    return () => {
-      window.removeEventListener('scroll', tick, { capture: true } as EventListenerOptions);
-      window.removeEventListener('resize', tick);
-    };
+    return unwatch;
   }, [authored, value, suffix]);
 
   return <span ref={ref} className={className}>{display ?? authored}</span>;

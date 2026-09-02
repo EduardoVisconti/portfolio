@@ -64,7 +64,9 @@ export function createRateLimiter({ ipWindowMs, ipMax, dayMax, now = Date.now }:
     // `hits` only grows on a served request, so it is bounded by dayMax per
     // day; this prunes addresses whose window has fully aged out.
     if (hits.size > dayMax) {
-      for (const [k, v] of hits) if (!v.some((x) => t - x < ipWindowMs)) hits.delete(k);
+      hits.forEach((v: number[], k: string) => {
+        if (!v.some((x) => t - x < ipWindowMs)) hits.delete(k);
+      });
     }
     return null;
   };

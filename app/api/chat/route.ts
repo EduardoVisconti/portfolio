@@ -1,4 +1,4 @@
-import { GoogleGenerativeAI } from '@google/generative-ai';
+import { GoogleGenerativeAI, type GenerationConfig } from '@google/generative-ai';
 import { NextResponse } from 'next/server';
 import { ASSISTANT_CONTEXT } from '@/lib/assistant-context';
 import { createRateLimiter, toGeminiHistory, type Msg } from '@/lib/chat';
@@ -53,14 +53,19 @@ export async function POST(req: Request) {
       systemInstruction: ASSISTANT_CONTEXT,
       generationConfig: {
         // Thinking is on by default on 2.5 Flash and its tokens are billed
-        // against maxOutputTokens. Left alone, the model can spend the whole
+        // against maxOutputTokens. Left alone the model can spend the whole
         // budget reasoning and return MAX_TOKENS with no text - a 200 carrying
-        // an empty string, which the console then reports as an outage. The
-        // answers here are 2-5 sentences; there is nothing to think about.
+        // an empty string, which the console then reports as an outage.
+        //
+        // thinkingConfig is honoured by the REST API but absent from this
+        // SDK's types, hence the cast. The headroom below is the belt to that
+        // brace: even if the field is dropped in transit, 2048 tokens leaves
+        // room for a 2-5 sentence answer after any amount of thinking, and an
+        // empty body is now a 502 rather than a silent 200.
         thinkingConfig: { thinkingBudget: 0 },
-        maxOutputTokens: 1200,
+        maxOutputTokens: 2048,
         temperature: 0.4,
-      },
+      } as GenerationConfig,
     });
 
     const chat = model.startChat({ history });
