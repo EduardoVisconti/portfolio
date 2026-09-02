@@ -59,6 +59,12 @@ export function Hero() {
         <p className="m-0 max-w-[400px] flex-[1_1_280px] text-p-small text-ink-muted [text-wrap:pretty]">
           {HERO.support}
         </p>
+
+        {/* Where he works, for how long, and where he came from. The page cannot
+            answer a recruiter's first four questions without this. */}
+        <p className="m-0 w-full font-mono text-m-11-r tracking-t2 text-ink-faint [text-wrap:pretty]">
+          {HERO.now}
+        </p>
       </div>
 
       {/*

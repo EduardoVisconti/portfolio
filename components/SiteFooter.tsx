@@ -1,4 +1,4 @@
-import { FOOTER } from '@/lib/content';
+import { FOOTER, IDENTITY } from '@/lib/content';
 
 export function SiteFooter() {
   return (
@@ -6,6 +6,12 @@ export function SiteFooter() {
       <span>{FOOTER.copyright}</span>
       <span>{FOOTER.place}</span>
       <span className="ml-auto">{FOOTER.built}</span>
+      <a
+        href={IDENTITY.resume}
+        className="font-mono text-m-10 tracking-t9 text-ink-faint underline decoration-mark underline-offset-[5px] transition-colors hover:text-accent"
+      >
+        {FOOTER.resumeLabel}
+      </a>
     </footer>
   );
 }

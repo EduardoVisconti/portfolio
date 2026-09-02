@@ -11,6 +11,12 @@ export const IDENTITY = {
   location: 'TAMPA, FL',
   languages: 'EN · PT · ES',
   email: 'eduardo.visconti.dev@gmail.com',
+  title: 'Full-Stack Engineer',
+  employer: 'United Financial Resources',
+  employerCity: 'Bradenton, FL',
+  since: 'April 2026',
+  authorised: 'Authorised to work in the United States',
+  resume: '/resume.pdf',
   linkedin: 'https://linkedin.com/in/eduardo-visconti',
   github: 'https://github.com/eduardovisconti',
 } as const;
@@ -19,6 +25,10 @@ export const HERO = {
   ledeBefore: 'I build production systems where an ',
   ledeAccent: 'LLM agent is part of the runtime',
   ledeAfter: ' — not a demo bolted to the side of one.',
+  now:
+    'AI Engineer at United Financial Resources since April 2026, working as a ' +
+    'Full-Stack Engineer across a Python backend and a TypeScript front end. ' +
+    'Five years at Tesla before software; self-taught into it from 2021.',
   support:
     'Budget ceilings. Human approval gates. Failure classification. Self-healing ' +
     'when an upstream source changes shape. Front-end is my favorite half of ' +
@@ -82,6 +92,8 @@ export const THINKING = [
 
 export type WorkItem = {
   title: string;
+  /** A figure without a time denominator is a shrug. */
+  period: string;
   kicker: string;
   kickerAccent?: boolean;
   description: string;
@@ -95,6 +107,7 @@ export type WorkItem = {
 export const WORK: WorkItem[] = [
   {
     title: 'Forja',
+    period: '2026 — NOW',
     kicker: 'MY OWN PRODUCT · SHIPPING',
     kickerAccent: true,
     description:
@@ -120,6 +133,7 @@ export const WORK: WorkItem[] = [
   },
   {
     title: 'Deed Retrieval Platform',
+    period: 'APR 2026 — NOW · 14 MONTHS',
     kicker: 'SOLE ENGINEER · PRODUCTION',
     description:
       'An agent-driven retrieval system running against 77 county and vendor portals ' +
@@ -134,6 +148,7 @@ export const WORK: WorkItem[] = [
   },
   {
     title: 'AI Hub',
+    period: 'APR 2026 — NOW',
     kicker: 'TEAM · IN PRODUCTION',
     description:
       'The internal multi-agent platform several departments run on. I build the ' +
@@ -149,6 +164,7 @@ export const WORK: WorkItem[] = [
   },
   {
     title: 'Sueli Repulho',
+    period: '2025 — NOW',
     kicker: 'CLIENT WORK · SHIPPED',
     description:
       'Practice site and the subscription product beside it, for a clinical ' +
@@ -166,6 +182,7 @@ export const WORK: WorkItem[] = [
   },
   {
     title: 'LeadFlow CRM',
+    period: '2025',
     kicker: 'CLIENT PLATFORM · OPEN SOURCE',
     description:
       'A full CRM for electronics resellers — drag-and-drop pipeline, contact and ' +
@@ -236,6 +253,7 @@ export const SECTIONS = [
 ] as const;
 
 export const FOOTER = {
+  resumeLabel: 'RÉSUMÉ (PDF) ↗',
   copyright: '© 2026 EDUARDO VISCONTI',
   place: 'TAMPA, FL · EN · PT · ES',
   built: 'NEXT.JS · TAILWIND · TYPESCRIPT',

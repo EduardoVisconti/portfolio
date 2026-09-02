@@ -46,7 +46,10 @@ export function Work() {
             <div className="flex flex-wrap items-center gap-x-[18px] gap-y-2 font-mono text-m-11-r tracking-t3 text-ink-dim">
               {item.meta.map((m, k) => (
                 <span key={m} className="flex items-center gap-x-[18px]">
-                  {k > 0 ? <span aria-hidden className="text-ink-separator">/</span> : null}
+                  {k > 0 ? <span aria-hidden className="text-ink-separator">/</span>
+            <span className="mt-[7px] block font-mono text-m-10-r tracking-t4 text-ink-dim">
+              {item.period}
+            </span> : null}
                   {m}
                 </span>
               ))}
