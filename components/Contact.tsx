@@ -45,9 +45,6 @@ export function Contact() {
             </a>
           </div>
 
-          <p className="mt-[clamp(28px,3vw,40px)] max-w-[380px] font-mono text-m-11-r tracking-t3 text-ink-faint">
-            {CONTACT.note}
-          </p>
         </div>
       </Reveal>
     </section>

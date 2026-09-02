@@ -167,7 +167,7 @@ export function AskMeAnything() {
       </Reveal>
 
       <div className="flex flex-wrap gap-x-7 gap-y-[10px] pt-[14px] font-mono text-m-10-r tracking-t6 text-ink-faint">
-        <span>MODEL · CLAUDE</span>
+        <span>MODEL · GEMINI</span>
         <span>TURNS · {String(turns).padStart(2, '0')}</span>
         <span>LAST · {latency === null ? '—' : `${latency}ms`}</span>
         <span className="ml-auto">CONTEXT LOADED FROM MY OWN NOTES</span>

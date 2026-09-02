@@ -1,14 +1,20 @@
 name: CI
 
 # The site claims a CI gate that fails the pull request. This is that gate.
+# Scoped to what a portfolio actually needs: it does not ship a backend, a
+# database or user data, so there is no e2e suite and no schema check here.
 
 on:
   pull_request:
   push:
     branches: [main]
 
+permissions:
+  contents: read
+
 jobs:
-  verify:
+  validate:
+    name: typecheck, lint, build
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -16,15 +22,42 @@ jobs:
         with:
           node-version: '20'
           cache: npm
-      # `npm install`, not `npm ci`: package-lock.json still carries the
-      # dependencies pruned in this branch. Regenerate the lock locally
-      # (`npm install` and commit it) and this can go back to `npm ci`.
+      # `npm install`, not `npm ci`: package-lock.json still carries dependencies
+      # pruned in this branch. Regenerate the lock and this goes back to `npm ci`.
       - run: npm install --no-audit --no-fund
-      - name: Typecheck
-        run: npm run typecheck
-      - name: Lint
-        run: npm run lint
-      - name: Build
-        run: npm run build
+      - run: npm run typecheck
+      - run: npm run lint
+      - run: npm run build
+
+  secrets:
+    name: secret scan
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: gitleaks/gitleaks-action@v2
         env:
-          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  vulnerabilities:
+    name: dependency audit
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: google/osv-scanner-action/osv-scanner-action@v2.2.4
+        with:
+          scan-args: |-
+            --lockfile=./package-lock.json
+
+  links:
+    name: external links resolve
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      # Every claim on this page is a link out. One that 404s costs more than a
+      # lint error, and nothing else in this pipeline would catch it.
+      - uses: lycheeverse/lychee-action@v2
+        with:
+          args: --no-progress --accept 200,206,429 lib/ README.md
+          fail: true

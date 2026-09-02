@@ -152,7 +152,7 @@ export const ASK = {
   headAccent: 'Interrogate',
   headAfter: ' the site.',
   support:
-    'A real Anthropic-backed route with my context loaded — the same one running in ' +
+    'A real model-backed route with my context loaded — the same one running in ' +
     "production here. If you're screening me, this is faster than the résumé and it " +
     'answers follow-ups.',
   emptyPrompt:
@@ -174,7 +174,6 @@ export const CONTACT = {
   support:
     "If it has an agent in the runtime and a real failure budget, I'll have opinions " +
     'before the call ends.',
-  note: 'Not looking right now, but I read everything and I answer.',
 } as const;
 
 export const SECTIONS = [

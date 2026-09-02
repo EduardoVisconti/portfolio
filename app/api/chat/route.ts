@@ -1,25 +1,27 @@
-import Anthropic from '@anthropic-ai/sdk';
+import { GoogleGenerativeAI } from '@google/generative-ai';
 import { NextResponse } from 'next/server';
 import { ASSISTANT_CONTEXT } from '@/lib/assistant-context';
 
 export const runtime = 'nodejs';
 
-const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY! });
-
-type Msg = { role: 'user' | 'assistant'; content: string };
-
+/**
+ * Gemini, on the free tier: this console has to run without a paid API account,
+ * and Google AI Studio grants a permanent free allowance (no card) that is far
+ * more than a portfolio consumes. Flash is also the right shape for the job -
+ * the system prompt asks for 2-5 sentences, so latency matters more than depth.
+ */
+const MODEL = 'gemini-2.5-flash';
 const MAX_TURNS = 12;          // conversation depth cap
 const MAX_CHARS = 1200;        // per-message input cap
 
 /**
- * Cost guard. This route is public and unauthenticated, so without a ceiling a
- * single script can spend the API budget. Two limits, both in memory:
- * a per-IP sliding window, and a global daily cap as the backstop.
+ * Cost and quota guard. This route is public and unauthenticated, so without a
+ * ceiling one script can burn the daily free allowance. Two limits, both in
+ * memory: a per-IP sliding window and a global daily cap as the backstop.
  *
  * Serverless instances do not share memory, so these are per-instance and
  * therefore soft. They stop casual abuse and bot sweeps, not a determined
- * distributed attacker - for that, put a rate limit at the edge (Vercel
- * Firewall) or move the counters to a shared store.
+ * distributed attacker - for that, rate limit at the edge.
  */
 const IP_WINDOW_MS = 60 * 60 * 1000;   // 1 hour
 const IP_MAX = 20;                     // questions per IP per window
@@ -51,10 +53,16 @@ function overLimit(ip: string): boolean {
   return false;
 }
 
+type Msg = { role: 'user' | 'assistant'; content: string };
+
 export async function POST(req: Request) {
+  const key = process.env.GEMINI_API_KEY;
+  if (!key) {
+    return NextResponse.json({ error: 'unconfigured' }, { status: 503 });
+  }
+
   try {
-    const ip =
-      req.headers.get('x-forwarded-for')?.split(',')[0].trim() ?? 'unknown';
+    const ip = req.headers.get('x-forwarded-for')?.split(',')[0].trim() ?? 'unknown';
     if (overLimit(ip)) {
       return NextResponse.json({ error: 'rate_limited' }, { status: 429 });
     }
@@ -66,26 +74,31 @@ export async function POST(req: Request) {
     }
 
     // Trim: keep the last MAX_TURNS exchanges, clamp each message length.
-    const messages = incoming
+    const turns = incoming
       .slice(-MAX_TURNS * 2)
       .map((m) => ({
-        role: m.role === 'assistant' ? ('assistant' as const) : ('user' as const),
-        content: String(m.content ?? '').slice(0, MAX_CHARS),
+        role: m.role === 'assistant' ? ('model' as const) : ('user' as const),
+        parts: [{ text: String(m.content ?? '').slice(0, MAX_CHARS) }],
       }))
-      .filter((m) => m.content.length > 0);
+      .filter((m) => m.parts[0].text.length > 0);
 
-    const res = await anthropic.messages.create({
-      model: 'claude-opus-5',
-      max_tokens: 600,
-      system: ASSISTANT_CONTEXT,
-      messages,
+    // Gemini takes the history separately from the message being answered, and
+    // a history must open on a user turn.
+    const latest = turns.pop();
+    if (!latest) {
+      return NextResponse.json({ error: 'no messages' }, { status: 400 });
+    }
+    while (turns.length && turns[0].role !== 'user') turns.shift();
+
+    const model = new GoogleGenerativeAI(key).getGenerativeModel({
+      model: MODEL,
+      systemInstruction: ASSISTANT_CONTEXT,
+      generationConfig: { maxOutputTokens: 600, temperature: 0.4 },
     });
 
-    const reply = res.content
-      .filter((b): b is Anthropic.TextBlock => b.type === 'text')
-      .map((b) => b.text)
-      .join('')
-      .trim();
+    const chat = model.startChat({ history: turns });
+    const result = await chat.sendMessage(latest.parts[0].text);
+    const reply = result.response.text().trim();
 
     return NextResponse.json({ reply });
   } catch (err) {
