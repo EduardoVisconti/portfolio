@@ -9,7 +9,7 @@ import { SectionHeader } from './SectionHeader';
  */
 export function Thinking() {
   return (
-    <section id="thinking" data-screen-label="03 How I Think" className="py-section">
+    <section id="thinking" className="py-section">
       <div className="mb-[clamp(40px,5vw,64px)]">
         <SectionHeader n="03" title="How I Think" aside="3 DECISIONS FROM PRODUCTION" />
       </div>

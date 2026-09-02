@@ -14,7 +14,7 @@ export function Work() {
     'font-medium tracking-t6 text-ink transition-colors hover:border-accent hover:text-accent';
 
   return (
-    <section id="work" data-screen-label="04 Work" className="py-section">
+    <section id="work" className="py-section">
       <div className="mb-[clamp(30px,4vw,48px)]">
         <SectionHeader n="02" title="Work" aside="SELECTED · 2024 — 2026" />
       </div>

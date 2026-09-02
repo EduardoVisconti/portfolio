@@ -12,7 +12,6 @@ export function Hero() {
   return (
     <section
       id="top"
-      data-screen-label="01 Hero"
       className="flex min-h-[100svh] flex-col justify-center pb-10 pt-[120px]"
     >
       <div

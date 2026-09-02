@@ -7,7 +7,7 @@ export function Numbers() {
   const { commits, commitsLabel, code, ledger } = NUMBERS;
 
   return (
-    <section id="numbers" data-screen-label="02 The Numbers" className="py-section">
+    <section id="numbers" className="py-section">
       <div className="mb-[clamp(44px,6vw,76px)]">
         <SectionHeader n="04" title="The Numbers" aside="ALL VERIFIED · ALL MINE" />
       </div>

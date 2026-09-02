@@ -55,8 +55,6 @@ function overLimit(ip: string): boolean {
   dayCount += 1;
   recent.push(now);
   hits.set(ip, recent);
-
-  if (hits.size > 5000) hits.clear();   // unbounded-growth guard
   return false;
 }
 

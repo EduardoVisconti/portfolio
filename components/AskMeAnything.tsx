@@ -65,7 +65,7 @@ export function AskMeAnything() {
   const status = busy ? 'GENERATING' : messages.length ? 'READY' : 'IDLE';
 
   return (
-    <section id="ask" data-screen-label="06 Ask Me Anything" className="py-section">
+    <section id="ask" className="py-section">
       <div className="mb-[clamp(34px,4vw,52px)]">
         <SectionHeader n="06" title="Ask Me Anything" aside="LIVE · /api/chat" />
       </div>
