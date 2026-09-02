@@ -1,0 +1,68 @@
+name: Monthly portfolio refresh
+
+# The site's figures go stale silently: commits accumulate, integrations get
+# added, projects ship. This opens one issue a month so the numbers get a
+# deliberate review instead of drifting.
+#
+# Note: scheduled workflows only run from the default branch, so this starts
+# firing once it is merged to main.
+
+on:
+  schedule:
+    - cron: '0 13 3 * *'   # 3rd of each month, 13:00 UTC (09:00 ET)
+  workflow_dispatch:        # and on demand
+
+permissions:
+  issues: write
+
+jobs:
+  open-refresh-issue:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Open the refresh issue
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const month = new Date().toLocaleString('en-US', {
+              month: 'long', year: 'numeric', timeZone: 'America/New_York',
+            });
+
+            const body = [
+              '@EduardoVisconti - monthly check on the numbers behind the site.',
+              '',
+              'Every figure on the page lives in `lib/content.ts`. They are stated as fact,',
+              'so a stale one is a wrong one. Ask Claude to pull the current values and',
+              'open a PR with whatever moved.',
+              '',
+              '### Figures to re-derive',
+              '',
+              '- [ ] Commits and commit share on the deed platform (currently 1,271 of 1,297)',
+              '- [ ] Vendor-portal integrations (currently 77)',
+              '- [ ] County coverage (currently 3,000+)',
+              '- [ ] Architecture decision records (currently 46)',
+              '- [ ] Pull requests shipped and merge rate (currently 120 at 93%)',
+              '- [ ] Test lines vs source lines (currently 68,672 / 50,302, ratio 1.37x)',
+              '- [ ] Pull requests on Forja (currently 187)',
+              '',
+              '### Beyond the numbers',
+              '',
+              '- [ ] Any new project worth a row in `WORK`? The ledger grows by appending.',
+              '- [ ] Sueli v2 shipped? If so it earns a row and a case study.',
+              '- [ ] Any new engineering decision worth adding to `THINKING`?',
+              '- [ ] Stack still accurate in `lib/content.ts` and `lib/assistant-context.ts`?',
+              '- [ ] Every external link still resolves.',
+              '- [ ] Role, employer and title still current.',
+              '',
+              '### Reminder',
+              '',
+              'If a number changes in `content.ts`, change it in `assistant-context.ts` too.',
+              'The assistant states these figures out loud and will contradict the page otherwise.',
+            ].join('\n');
+
+            await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: `Portfolio refresh - ${month}`,
+              body,
+              assignees: ['EduardoVisconti'],
+            });

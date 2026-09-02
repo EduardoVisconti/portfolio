@@ -102,6 +102,7 @@ export const WORK: WorkItem[] = [
     meta: ['187 PULL REQUESTS', 'REACT NATIVE', 'NEXT.JS', 'POSTGRESQL RLS'],
     links: [
       { label: 'LIVE APP ↗', href: 'https://app.forjahybrid.com', external: true },
+      { label: 'TESTFLIGHT ↗', href: 'https://testflight.apple.com/join/bRREz5sS', external: true },
       {
         label: 'CASE STUDY ↗',
         href: 'https://github.com/EduardoVisconti/forja-case-study',
