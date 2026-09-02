@@ -46,6 +46,11 @@ export function AskMeAnything() {
       if (res.ok) {
         const data = await res.json();
         if (typeof data?.reply === 'string' && data.reply.trim()) reply = data.reply.trim();
+      } else if (res.status === 429) {
+        // The guard is doing its job; saying "unreachable" would be a lie.
+        reply = ASK.rateLimited;
+      } else if (res.status === 503) {
+        reply = ASK.unconfigured;
       }
     } catch {
       /* keep fallback */
