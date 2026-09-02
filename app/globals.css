@@ -79,3 +79,9 @@
   *, *::before, *::after { animation: none !important; }
   html { scroll-behavior: auto; }
 }
+
+/* The header is fixed at 60px, so an anchor jump would otherwise park the
+   heading underneath it. Applies to the in-page nav and the index rail. */
+section[id] {
+  scroll-margin-top: 76px;
+}

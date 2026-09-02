@@ -196,5 +196,5 @@ export const SECTIONS = [
 export const FOOTER = {
   copyright: '© 2026 EDUARDO VISCONTI',
   place: 'TAMPA, FL · EN · PT · ES',
-  built: 'NEXT.JS · TAILWIND · FRAMER MOTION',
+  built: 'NEXT.JS · TAILWIND · TYPESCRIPT',
 } as const;

@@ -1,16 +1,19 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { easeOutCubic } from '@/lib/motion';
+
+/** SPEC-motion.md: ease-out-cubic, the curve every counter uses. */
+const easeOutCubic = (p: number) => 1 - Math.pow(1 - p, 3);
 
 /**
  * SPEC-motion.md §3. Two robustness rules are load-bearing:
  *
- *  1. The authored numeral is rendered as real text and only replaced once the
- *     animation actually starts. A failed visibility check can therefore never
- *     leave a blank or a zero where a headline figure should be.
- *  2. A 2600ms safety timeout forces any counter that never started to its
- *     final value.
+ * The authored numeral is rendered as real text and only replaced once the
+ * animation actually starts, so a failed visibility check can never leave a
+ * blank or a zero where a headline figure should be. That render fallback is
+ * the whole safety net - there is deliberately no timeout backstop, because a
+ * timer armed on mount fires for every counter still below the fold and marks
+ * it started, which permanently disables the animation it was meant to protect.
  *
  * Deliberately NOT using IntersectionObserver: rect reads in a single shared
  * scroll handler behave predictably inside transformed / container-query
@@ -29,8 +32,6 @@ export function Counter({
     if (!el) return;
 
     const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-    const finish = () => { started.current = true; setDisplay(authored); };
 
     const run = () => {
       if (started.current) return;
@@ -54,12 +55,10 @@ export function Counter({
     tick();
     window.addEventListener('scroll', tick, { passive: true, capture: true });
     window.addEventListener('resize', tick);
-    const safety = setTimeout(finish, 2600);
 
     return () => {
       window.removeEventListener('scroll', tick, { capture: true } as EventListenerOptions);
       window.removeEventListener('resize', tick);
-      clearTimeout(safety);
     };
   }, [authored, value, suffix]);
 

@@ -13,7 +13,7 @@ export function Hero() {
     <section
       id="top"
       data-screen-label="01 Hero"
-      className="flex min-h-screen flex-col justify-center pb-10 pt-[120px]"
+      className="flex min-h-[100svh] flex-col justify-center pb-10 pt-[120px]"
     >
       <div
         className="flex flex-wrap items-center gap-x-7 gap-y-4 pb-[22px]"

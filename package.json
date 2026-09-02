@@ -6,19 +6,15 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.78.0",
-    "@google/generative-ai": "^0.24.1",
-    "clsx": "^2.1.1",
-    "framer-motion": "^12.34.3",
-    "lucide-react": "^0.575.0",
     "next": "14.2.35",
     "react": "^18",
     "react-dom": "^18",
-    "resend": "^6.9.2",
-    "tailwind-merge": "^3.5.0"
+    "resend": "^6.9.2"
   },
   "devDependencies": {
     "@types/node": "^20",

@@ -15,16 +15,25 @@ const mono = IBM_Plex_Mono({
   display: 'swap', variable: '--font-mono',
 });
 
+const SITE = 'https://eduardo-visconti.vercel.app';
+const TITLE = 'Eduardo Visconti — AI Engineer · Full-Stack';
+const DESCRIPTION =
+  'Production systems where an LLM agent is part of the runtime. Budget ceilings, ' +
+  'approval gates, failure classification, self-healing.';
+
 export const metadata: Metadata = {
-  title: 'Eduardo Visconti — AI Engineer · Full-Stack',
-  description:
-    'Production systems where an LLM agent is part of the runtime. Budget ceilings, ' +
-    'approval gates, failure classification, self-healing.',
+  metadataBase: new URL(SITE),
+  title: TITLE,
+  description: DESCRIPTION,
+  alternates: { canonical: '/' },
   openGraph: {
-    title: 'Eduardo Visconti — AI Engineer · Full-Stack',
-    description: 'Production systems where an LLM agent is part of the runtime.',
+    title: TITLE,
+    description: DESCRIPTION,
     type: 'website',
+    url: SITE,
+    siteName: 'Eduardo Visconti',
   },
+  twitter: { card: 'summary_large_image', title: TITLE, description: DESCRIPTION },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
