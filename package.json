@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "next lint",
     "typecheck": "tsc --noEmit",
-    "invariants": "node scripts/invariants.mjs"
+    "invariants": "node scripts/invariants.mjs",
+    "test": "node --test --experimental-strip-types lib/chat.test.ts"
   },
   "dependencies": {
     "@google/generative-ai": "^0.24.1",

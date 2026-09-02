@@ -14,17 +14,18 @@ permissions:
 
 jobs:
   validate:
-    name: invariants, typecheck, lint, build
+    name: invariants, tests, typecheck, lint, build
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '22'
           cache: npm
       - run: npm ci
       - run: npm run invariants
       - run: npm run typecheck
+      - run: npm test
       - run: npm run lint
       - run: npm run build
 
