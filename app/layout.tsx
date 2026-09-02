@@ -15,7 +15,8 @@ const mono = IBM_Plex_Mono({
   display: 'swap', variable: '--font-mono',
 });
 
-const SITE = 'https://eduardo-visconti.vercel.app';
+import { IDENTITY, SITE } from '@/lib/content';
+
 const TITLE = 'Eduardo Visconti — AI Engineer · Full-Stack';
 const DESCRIPTION =
   'Production systems where an LLM agent is part of the runtime. Budget ceilings, ' +
@@ -39,7 +40,36 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className={`${display.variable} ${sans.variable} ${mono.variable}`}>
-      <body>{children}</body>
+      <body>
+        {/* Structured data is how an extractor reads him correctly instead of
+            guessing from prose. */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              '@context': 'https://schema.org',
+              '@type': 'ProfilePage',
+              mainEntity: {
+                '@type': 'Person',
+                name: 'Eduardo Visconti',
+                jobTitle: 'AI Engineer',
+                description: DESCRIPTION,
+                email: `mailto:${IDENTITY.email}`,
+                url: SITE,
+                worksFor: { '@type': 'Organization', name: IDENTITY.employer },
+                address: { '@type': 'PostalAddress', addressLocality: 'Tampa', addressRegion: 'FL', addressCountry: 'US' },
+                knowsLanguage: ['en', 'pt', 'es'],
+                knowsAbout: [
+                  'Large language model agents', 'Python', 'FastAPI', 'TypeScript',
+                  'React', 'Next.js', 'React Native', 'PostgreSQL', 'Browser automation',
+                ],
+                sameAs: [IDENTITY.linkedin, IDENTITY.github],
+              },
+            }),
+          }}
+        />
+        {children}
+      </body>
     </html>
   );
 }

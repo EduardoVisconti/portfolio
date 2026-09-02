@@ -1,0 +1,39 @@
+# Eduardo Visconti
+
+> AI Engineer and full-stack developer in Tampa, FL. Builds production systems
+> where an LLM agent is part of the runtime: budget ceilings, human approval
+> gates, failure classification, self-healing when an upstream source changes
+> shape.
+
+## Current role
+
+AI Engineer at United Financial Resources (Bradenton, FL) since April 2026.
+Sole engineer on an automated property-deed retrieval platform with nationwide
+US county coverage: 77 vendor-portal integrations behind one dispatcher, an
+agent layer built on Anthropic and OpenAI tool-use, 46 architecture decision
+records, and 68,672 lines of tests against 50,302 lines of source. Also builds
+the client for an internal multi-agent platform, shipped through review by three
+other engineers.
+
+## Work
+
+- Forja — his own product. Offline-first hybrid-training app, React Native and
+  Expo on Supabase with row-level security. https://app.forjahybrid.com
+- Sueli Repulho — client delivery. Practice site and subscription product for a
+  clinical psychologist. https://suelirepulho.com.br
+- LeadFlow CRM — client delivery, open source.
+  https://leadflow-electronics.vercel.app
+
+## Stack
+
+Python, FastAPI, asyncio, pytest, Playwright, PostgreSQL with row-level
+security, TypeScript, React, React Native, Next.js, Docker, GitHub Actions,
+Anthropic and OpenAI tool-use, MCP, RAG.
+
+## Contact
+
+eduardo.visconti.dev@gmail.com · https://linkedin.com/in/eduardo-visconti ·
+https://github.com/EduardoVisconti
+
+Not actively job searching. Fluent in English, Spanish and Portuguese.
+Authorised to work in the United States.

@@ -5,6 +5,8 @@
  * invent one. Adding work over the years = append to WORK; the layout follows.
  */
 
+export const SITE = 'https://eduardo-visconti.vercel.app';
+
 export const IDENTITY = {
   name: { first: 'Eduardo', last: 'Visconti' },
   role: 'AI ENGINEER · FULL-STACK',
