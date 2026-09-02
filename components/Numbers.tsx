@@ -9,7 +9,7 @@ export function Numbers() {
   return (
     <section id="numbers" className="py-section">
       <div className="mb-[clamp(44px,6vw,76px)]">
-        <SectionHeader n="04" title="The Numbers" aside="ALL VERIFIED · ALL MINE" />
+        <SectionHeader id="numbers" />
       </div>
 
       <Reveal range={26} className="flex flex-wrap items-end gap-[clamp(36px,5vw,72px)]">
@@ -25,7 +25,15 @@ export function Numbers() {
           </div>
 
           <div className="relative mt-[26px] h-0.5 overflow-hidden bg-bartrack">
-            <div className="bar-draw bar-draw-slow absolute inset-y-0 left-0 right-[2%] bg-accent" />
+            {/* Derived, not typed: a literal drifts the moment the commit share
+                changes, and the bar would then disagree with the figure that
+                labels it. */}
+            <div
+              className="bar-draw bar-draw-slow absolute inset-y-0 left-0 bg-accent"
+              style={{
+                right: `${(100 - (100 * NUMBERS.commits.value) / NUMBERS.commits.of).toFixed(1)}%`,
+              }}
+            />
           </div>
 
           <div className="mt-[14px] flex justify-between gap-5 font-mono text-m-11-r tracking-t5 text-ink-muted">

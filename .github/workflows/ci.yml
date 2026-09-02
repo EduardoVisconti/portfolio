@@ -63,10 +63,12 @@ jobs:
       # first makes the check deterministic and the input inspectable.
       - name: Collect the URLs the page claims
         run: |
-          grep -rhoE 'https?://[^"'"'"'`, )]+' lib/ README.md | sed 's/[.,)]*$//' | sort -u > links.txt
+          grep -rhoE 'https?://[^"'"'"'`, )]+' lib/ README.md public/llms.txt | sed 's/[.,)]*$//' | sort -u > links.txt
           echo "found $(wc -l < links.txt) unique links"
           cat links.txt
       - uses: lycheeverse/lychee-action@v2
         with:
-          args: --no-progress --accept 200,206,429 --max-concurrency 4 links.txt
+          # LinkedIn serves runner IPs a 999. Excluded rather than accepted, so a
+          # real break elsewhere is not masked by a permissive status list.
+          args: --no-progress --accept 200,206,429 --max-concurrency 4 --exclude 'linkedin\.com' links.txt
           fail: true

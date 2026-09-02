@@ -17,7 +17,7 @@ export const IDENTITY = {
   employer: 'United Financial Resources',
   employerCity: 'Bradenton, FL',
   since: 'April 2026',
-  authorised: 'Authorised to work in the United States',
+  authorized: 'Authorized to work in the United States',
   resume: '/resume.pdf',
   linkedin: 'https://linkedin.com/in/eduardo-visconti',
   github: 'https://github.com/eduardovisconti',
@@ -28,7 +28,7 @@ export const HERO = {
   ledeAccent: 'LLM agent is part of the runtime',
   ledeAfter: ' — not a demo bolted to the side of one.',
   now:
-    'AI Engineer at United Financial Resources since April 2026, working as a ' +
+    `AI Engineer at ${IDENTITY.employer} since ${IDENTITY.since}, working as a ` +
     'Full-Stack Engineer across a Python backend and a TypeScript front end. ' +
     'Five years at Tesla before software; self-taught into it from 2021.',
   support:
@@ -102,7 +102,7 @@ export type WorkItem = {
   meta: string[];
   links?: { label: string; href: string; external?: boolean }[];
   privateBadge?: { label: string; note: string };
-  /** Normalised to a common height, so a phone and a desktop sit in one band. */
+  /** Normalized to a common height, so a phone and a desktop sit in one band. */
   shots?: { src: string; w: number; h: number; alt: string }[];
 };
 
@@ -249,7 +249,7 @@ export const CONTACT = {
 
 export const SECTIONS = [
   { n: '01', id: 'top',      title: 'Hero',            aside: null,                         nav: false },
-  { n: '02', id: 'work',     title: 'Work',            aside: 'SELECTED · 2024 — 2026',     nav: true  },
+  { n: '02', id: 'work',     title: 'Work',            aside: 'SELECTED · 2025 — 2026',     nav: true  },
   { n: '03', id: 'thinking', title: 'How I Think',     aside: '3 DECISIONS FROM PRODUCTION', nav: true },
   { n: '04', id: 'numbers',  title: 'The Numbers',     aside: 'ALL VERIFIED',               nav: true  },
   { n: '05', id: 'stack',    title: 'Stack',           aside: 'BY LAYER, NOT BY LOGO',      nav: false },

@@ -32,7 +32,7 @@
 
 @layer components {
   /* The two gradients the design uses. They live here rather than inline in a
-     component so every colour in the palette resolves through the config. */
+     component so every color in the palette resolves through the config. */
   .hatch {
     background-image: repeating-linear-gradient(
       135deg, theme('backgroundColor.rowhover') 0 1px, transparent 1px 6px);
@@ -86,6 +86,9 @@
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; }
+  /* With no animation the progress line has no scaleX(0) to start from, so it
+     would sit at full width forever rather than tracking anything. */
+  .scroll-progress { display: none; }
   html { scroll-behavior: auto; }
 }
 

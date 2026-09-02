@@ -1,4 +1,5 @@
 import type { Config } from 'tailwindcss';
+import { PALETTE } from './lib/palette';
 
 /**
  * Encodes SPEC-tokens.md. Semantic names only — no raw hex in components.
@@ -8,11 +9,11 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        bg: '#08090A',
-        surface: '#0B0C0E',
+        bg: PALETTE.bg,
+        surface: PALETTE.surface,
         accent: {
-          DEFAULT: 'var(--accent, #C7F94A)',
-          ink: '#08090A', // text ON accent
+          DEFAULT: `var(--accent, ${PALETTE.accent})`,
+          ink: PALETTE.bg, // text ON accent
         },
         ink: {
           DEFAULT: '#F4F5F6',   // headlines, figures
@@ -21,10 +22,10 @@ const config: Config = {
           secondary: '#C9CDD1', // ledger labels, chips, user body
           prose: '#9AA0A6',     // main reading grey
           muted: '#8A9096',     // nav, supporting copy
-          faint: '#767C82',     // indices, footer, telemetry — FLOOR for real text
+          faint: '#8A9096',     // indices, footer, telemetry — FLOOR for real text (AA)
           idle: '#6E747A',      // rail idle, placeholders
-          dim: '#61666C',       // work meta
-          label: '#5C6166',     // 10-11px caps labels ONLY
+          dim: '#8A9096',       // work meta - carries the proof figures, so it clears AA
+          label: '#7E848A',     // 10-11px caps labels ONLY - lifted above the floor
           separator: '#2A2E33', // "/" glyphs, rail tick idle
         },
       },

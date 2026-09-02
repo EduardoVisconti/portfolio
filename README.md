@@ -56,9 +56,9 @@ flowchart TD
         ask["AskMeAnything<br/>transcript, latency"]
     end
 
-    subgraph edge["Edge"]
-        chat["/api/chat<br/>per-IP + daily guard"]
-        og["opengraph-image<br/>generated per request"]
+    subgraph server["Server"]
+        chat["/api/chat<br/>Node runtime, per-IP + daily guard"]
+        og["opengraph-image<br/>prerendered at build"]
     end
 
     gemini["Gemini API<br/>free tier"]
@@ -101,7 +101,8 @@ deliberately no timeout backstop: a timer armed on mount fires for every counter
 still below the fold and marks it started, disabling the animation it was meant
 to protect.
 
-**The console is real.** `/api/chat` runs on Gemini's free tier, because the site
+**The console is real.** `/api/chat` runs on Gemini's free tier, on the Node
+runtime, because the site
 has to work without a paid API account. The route is public and unauthenticated,
 so it carries a per-IP sliding window and a daily ceiling, and a request that is
 turned away spends neither budget. Both counters are per-instance and therefore
@@ -159,7 +160,7 @@ one.
 app/
   page.tsx              seven sections, in order
   layout.tsx            fonts, metadata, JSON-LD
-  opengraph-image.tsx   share card, generated at the edge
+  opengraph-image.tsx   share card, prerendered at build
   robots.ts sitemap.ts
   api/chat/route.ts     the console, with its rate guard
 components/             fifteen; three hold state
@@ -183,4 +184,4 @@ prose is a rule that decays, which is the argument the site itself makes.
 
 ## License
 
-No licence. All rights reserved — this is a personal site, not a template.
+No license. All rights reserved — this is a personal site, not a template.

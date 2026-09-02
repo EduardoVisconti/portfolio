@@ -80,18 +80,18 @@ export function AskMeAnything() {
   return (
     <section id="ask" className="py-section">
       <div className="mb-[clamp(34px,4vw,52px)]">
-        <SectionHeader n="06" title="Ask Me Anything" aside="LIVE · /api/chat" />
+        <SectionHeader id="ask" />
       </div>
 
       <Reveal
         range={24}
         className="mb-[clamp(30px,4vw,44px)] flex flex-wrap items-start gap-x-[clamp(40px,6vw,80px)] gap-y-8"
       >
-        <h2 className="m-0 max-w-[620px] flex-[1_1_380px] font-display text-d-ask font-normal text-ink [text-wrap:pretty]">
+        <p className="m-0 max-w-[620px] flex-[1_1_380px] font-display text-d-ask font-normal text-ink [text-wrap:pretty]">
           {ASK.headBefore}
           <span className="italic text-accent">{ASK.headAccent}</span>
           {ASK.headAfter}
-        </h2>
+        </p>
         <p className="m-0 max-w-[380px] flex-[1_1_280px] text-p-small text-ink-muted [text-wrap:pretty]">
           {ASK.support}
         </p>
@@ -171,7 +171,7 @@ export function AskMeAnything() {
             aria-label="Ask a question about Eduardo"
             placeholder={ASK.placeholder}
             onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); void ask(); } }}
-            className="min-w-0 flex-1 border-0 bg-transparent px-[14px] py-[19px] font-mono text-m-14 text-ink outline-none"
+            className="min-w-0 flex-1 border-0 bg-transparent px-[14px] py-[19px] font-mono text-[16px] text-ink outline-none"
           />
           <button
             type="button"

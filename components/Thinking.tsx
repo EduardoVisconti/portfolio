@@ -11,7 +11,7 @@ export function Thinking() {
   return (
     <section id="thinking" className="py-section">
       <div className="mb-[clamp(40px,5vw,64px)]">
-        <SectionHeader n="03" title="How I Think" aside="3 DECISIONS FROM PRODUCTION" />
+        <SectionHeader id="thinking" />
       </div>
 
       <Reveal

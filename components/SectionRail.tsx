@@ -33,17 +33,22 @@ export function SectionRail() {
   }, []);
 
   return (
-    <aside
+    <nav
       data-rail
-      aria-label="Section index"
+      aria-label="Sections"
       className="fixed left-[22px] top-0 z-[70] flex h-screen flex-col justify-center gap-4"
     >
       {SECTIONS.map((s) => {
         const on = active === s.id;
         return (
-          <a key={s.id} href={`#${s.id}`} className="flex items-center gap-[9px]"
-             aria-current={on ? 'true' : undefined}>
-            <span className={`font-mono text-m-10 tracking-t3 ${on ? 'text-accent' : 'text-ink-idle'}`}>
+          <a
+            key={s.id}
+            href={`#${s.id}`}
+            aria-label={`${s.n} ${s.title}`}
+            aria-current={on ? 'location' : undefined}
+            className="flex items-center gap-[9px]"
+          >
+            <span aria-hidden className={`font-mono text-m-10 tracking-t3 ${on ? 'text-accent' : 'text-ink-idle'}`}>
               {s.n}
             </span>
             <span
@@ -55,6 +60,6 @@ export function SectionRail() {
           </a>
         );
       })}
-    </aside>
+    </nav>
   );
 }

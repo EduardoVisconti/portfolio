@@ -8,10 +8,15 @@ export function SiteFooter() {
       <span className="ml-auto">{FOOTER.built}</span>
       <a
         href={IDENTITY.resume}
+        target="_blank"
+        rel="noopener"
         className="font-mono text-m-10 tracking-t9 text-ink-faint underline decoration-mark underline-offset-[5px] transition-colors hover:text-accent"
       >
         {FOOTER.resumeLabel}
       </a>
+      {/* The first question about a Brazilian candidate in Tampa. It was
+          answered for the assistant and for llms.txt, but never for a human. */}
+      <span className="font-mono text-m-10 tracking-t9 text-ink-faint">{IDENTITY.authorized}</span>
     </footer>
   );
 }

@@ -1,4 +1,5 @@
 import { ImageResponse } from 'next/og';
+import { PALETTE } from '@/lib/palette';
 
 /**
  * The card a LinkedIn post or a recruiter DM renders, which is the dominant way
@@ -20,30 +21,30 @@ export default function OpengraphImage() {
           display: 'flex',
           flexDirection: 'column',
           justifyContent: 'space-between',
-          background: '#08090A',
+          background: PALETTE.bg,
           padding: '72px 80px',
         }}
       >
-        <div style={{ display: 'flex', color: '#C7F94A', fontSize: 24, letterSpacing: '0.18em' }}>
+        <div style={{ display: 'flex', color: PALETTE.accent, fontSize: 24, letterSpacing: '0.18em' }}>
           AI ENGINEER · FULL-STACK
         </div>
 
         <div style={{ display: 'flex', flexDirection: 'column' }}>
-          <div style={{ display: 'flex', color: '#F4F5F6', fontSize: 128, lineHeight: 1, letterSpacing: '-0.04em' }}>
+          <div style={{ display: 'flex', color: PALETTE.ink, fontSize: 128, lineHeight: 1, letterSpacing: '-0.04em' }}>
             Eduardo
           </div>
-          <div style={{ display: 'flex', color: '#F4F5F6', fontSize: 128, lineHeight: 1, letterSpacing: '-0.04em' }}>
+          <div style={{ display: 'flex', color: PALETTE.ink, fontSize: 128, lineHeight: 1, letterSpacing: '-0.04em' }}>
             Visconti
           </div>
         </div>
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
-          <div style={{ display: 'flex', height: 1, width: '100%', background: 'rgba(255,255,255,0.12)' }} />
+          <div style={{ display: 'flex', height: 1, width: '100%', background: PALETTE.hairline }} />
           <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
-            <div style={{ display: 'flex', color: '#9AA0A6', fontSize: 27, maxWidth: 760 }}>
+            <div style={{ display: 'flex', color: PALETTE.prose, fontSize: 27, maxWidth: 760 }}>
               Production systems where an LLM agent is part of the runtime
             </div>
-            <div style={{ display: 'flex', color: '#767C82', fontSize: 22, letterSpacing: '0.1em' }}>
+            <div style={{ display: 'flex', color: PALETTE.faint, fontSize: 22, letterSpacing: '0.1em' }}>
               TAMPA, FL
             </div>
           </div>

@@ -17,15 +17,18 @@ site itself makes in ADR 03, so it would be strange not to apply it here.
    specifies: `·` `↗` `→` `↓` `/` `›` `✓` `—`.
 3. **Zero border-radius, zero box-shadow.** Everywhere, no exceptions. They are
    the two fastest ways for a page to read as a template.
-4. **Semantic colour names only.** No raw hex in components - the palette lives
-   in `tailwind.config.ts` and nowhere else.
+4. **Semantic color names only.** No raw hex and no `rgba()` in application
+   code. Raw values live in `lib/palette.ts`, which `tailwind.config.ts` builds
+   from and the Open Graph card imports - satori renders inline styles and
+   cannot resolve a Tailwind class.
 5. **Figures live in one place and are mirrored.** Every number is stated as
    fact, so a stale one is a wrong one. If a figure changes in
    `lib/content.ts`, change it in `lib/assistant-context.ts` too, or the
    assistant will contradict the page out loud, to a stranger, with confidence.
-6. **Only four components may hold state.** `Counter`, `SectionRail`,
-   `AskMeAnything`, `Contact`. Everything else is a Server Component, which is
-   how the page's motion ships zero JavaScript.
+6. **Exactly three components may hold state.** `Counter`, `SectionRail`,
+   `AskMeAnything`. Everything else is a Server Component, which is how the
+   page's motion ships zero JavaScript. The check asserts the count, not a
+   permission list, so a fourth fails the build.
 7. **No placeholder `href="#"`.** A dead link in production is a defect. If the
    URL does not exist yet, remove the link.
 
@@ -49,3 +52,7 @@ npm run build
 
 CI runs those, plus a secret scan, a dependency audit, and a link check over
 every external URL the page claims.
+
+8. **One spelling: American.** The audience is US recruiters, and mixed en-GB /
+   en-US in the sentence they read hardest is the detail this page claims to
+   care about.

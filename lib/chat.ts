@@ -86,7 +86,9 @@ export function toGeminiHistory(
     .slice(-maxTurns * 2)
     .map((m) => ({
       role: m.role === 'assistant' ? ('model' as const) : ('user' as const),
-      parts: [{ text: String(m.content ?? '').slice(0, maxChars) }],
+      // Trimmed before the emptiness test: '   ' has length 3 and used to
+      // survive as a turn made of whitespace.
+      parts: [{ text: String(m.content ?? '').trim().slice(0, maxChars) }],
     }))
     .filter((m) => m.parts[0].text.length > 0);
 

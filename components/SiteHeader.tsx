@@ -30,7 +30,7 @@ export function SiteHeader() {
 
         <a
           href="#contact"
-          className="ml-auto inline-flex h-[30px] items-center gap-[9px] border border-link px-[15px] font-mono text-m-11 font-medium tracking-t6 text-ink transition-colors hover:border-accent hover:text-accent"
+          className="inline-flex h-[30px] items-center gap-[9px] border border-link px-[15px] font-mono text-m-11 font-medium tracking-t6 text-ink transition-colors hover:border-accent hover:text-accent"
         >
           <span className="h-[5px] w-[5px] animate-pulse bg-accent" aria-hidden />
           CONTACT

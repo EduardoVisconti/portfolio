@@ -42,8 +42,8 @@ for (const f of ALL) {
   if (f.endsWith('assistant-context.ts')) {
     body = body.split('\n').filter((l) => !/^Never state or imply/.test(l)).join('\n');
   }
-  // This file quotes the forbidden phrases to match them.
-  if (f.endsWith('invariants.mjs')) continue;
+  // These two quote the forbidden phrases in order to forbid them.
+  if (f.endsWith('invariants.mjs') || f.endsWith('CONTRIBUTING.md')) continue;
   const m = body.match(SEEKING);
   check(!m, `${f}: says it is looking for work (${m?.[0]})`);
 }
@@ -51,25 +51,36 @@ check(/Never state or imply/.test(assistant), 'assistant-context.ts: lost the ru
 
 // 2. No emoji anywhere.
 const EMOJI = /[\u{1F300}-\u{1FAFF}\u{1F000}-\u{1F2FF}\u{2B00}-\u{2BFF}\u{FE0F}]/u;
-for (const f of CODE) check(!EMOJI.test(read(f)), `${f}: contains an emoji`);
+// This file names every pattern it hunts, so it cannot be one of its own targets.
+const SELF = (f) => f.endsWith('invariants.mjs');
+for (const f of CODE) check(SELF(f) || !EMOJI.test(read(f)), `${f}: contains an emoji`);
 
 // 3. Zero radius, zero shadow - in the utility names AND in raw CSS, which the
 //    class-name check alone could not see.
 for (const f of CODE) {
+  if (SELF(f)) continue;
   const body = read(f);
   check(!/\brounded(-|\b)/.test(body), `${f}: uses a border radius utility`);
   check(!/\bshadow(-|\b)/.test(body), `${f}: uses a box shadow utility`);
-  const radius = body.match(/border-radius\s*:\s*(?!0\s*[;}])[^;}]+/);
-  check(!radius, `${f}: sets a non-zero border-radius (${radius?.[0]?.trim()})`);
-  const shadow = body.match(/box-shadow\s*:\s*(?!none\s*[;}])[^;}]+/);
-  check(!shadow, `${f}: sets a box-shadow (${shadow?.[0]?.trim()})`);
+  // Capture the value and test it. A lookahead here backtracks: `\s*` gives
+  // back the space, the lookahead then passes because the next character is a
+  // space rather than `0`, and `border-radius: 0` reads as non-zero.
+  for (const m of body.matchAll(/border-radius\s*:\s*([^;}]+)/g)) {
+    check(m[1].trim() === '0', `${f}: sets a non-zero border-radius (${m[1].trim()})`);
+  }
+  for (const m of body.matchAll(/box-shadow\s*:\s*([^;}]+)/g)) {
+    check(m[1].trim() === 'none', `${f}: sets a box-shadow (${m[1].trim()})`);
+  }
 }
 
 // 4. Colour resolves through tailwind.config.ts and nowhere else. rgba() counts
 //    - a raw colour is a raw colour whatever notation it wears.
-for (const f of CODE.filter((f) => !f.includes('tailwind.config'))) {
+// tailwind.config builds from the palette, palette.ts holds the raw values,
+// and this file quotes the pattern it searches for.
+const COLOUR_EXEMPT = (f) => /tailwind\.config|palette\.ts|invariants\.mjs/.test(f);
+for (const f of CODE.filter((f) => !COLOUR_EXEMPT(f))) {
   for (const [i, line] of read(f).split('\n').entries()) {
-    if (/^\s*--[\w-]+\s*:/.test(line)) continue;          // a CSS variable definition
+    if (/--[\w-]+\s*:/.test(line)) continue;   // a CSS custom-property declaration
     const c = line.match(/#[0-9a-fA-F]{3,8}\b|rgba?\(/);
     check(!c, `${f}:${i + 1}: hardcodes a colour (${c?.[0]})`);
   }
@@ -120,7 +131,7 @@ for (const f of CODE) {
 //    recruiter reads hardest is the kind of detail this page claims to care about.
 const BRITISH = /\b(authorised|normalised|colour|licence|favourite|behaviour|organis(e|ed|ation))\b/i;
 for (const f of ALL) {
-  if (f.endsWith('invariants.mjs')) continue;
+  if (SELF(f)) continue;
   const m = read(f).match(BRITISH);
   check(!m, `${f}: en-GB spelling (${m?.[0]})`);
 }

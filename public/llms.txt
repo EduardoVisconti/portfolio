@@ -17,10 +17,18 @@ other engineers.
 
 ## Work
 
-- Forja — his own product. Offline-first hybrid-training app, React Native and
-  Expo on Supabase with row-level security. https://app.forjahybrid.com
-- Sueli Repulho — client delivery. Practice site and subscription product for a
-  clinical psychologist. https://suelirepulho.com.br
+- Forja — his own product. Offline-first hybrid-training app: React Native,
+  Next.js, PostgreSQL with row-level security. 187 pull requests, an iOS build
+  on TestFlight and a written case study. https://app.forjahybrid.com
+- Deed retrieval platform — private, no link. Sole engineer, 1,271 of 1,297
+  commits, 77 vendor-portal integrations, nationwide US county coverage, 46
+  architecture decision records.
+- AI Hub — internal, no link. Multi-agent platform; he builds the Next.js and
+  React 19 client with a custom NDJSON streaming protocol, against a
+  Python/FastAPI/Agno backend. 32 pull requests, reviewed by three engineers.
+- Sueli Repulho — client delivery, shipped. Practice site and the subscription
+  product beside it, for a clinical psychologist with 42 years of practice.
+  Astro, SEO-first, CI security gates. https://suelirepulho.com.br
 - LeadFlow CRM — client delivery, open source.
   https://leadflow-electronics.vercel.app
 

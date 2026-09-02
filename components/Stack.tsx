@@ -11,7 +11,7 @@ export function Stack() {
   return (
     <section id="stack" className="py-section">
       <div className="mb-[clamp(34px,4vw,52px)]">
-        <SectionHeader n="05" title="Stack" aside="BY LAYER, NOT BY LOGO" />
+        <SectionHeader id="stack" />
       </div>
 
       {STACK.map((row) => (
