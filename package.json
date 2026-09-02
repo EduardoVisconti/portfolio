@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "invariants": "node scripts/invariants.mjs"
   },
   "dependencies": {
     "@google/generative-ai": "^0.24.1",

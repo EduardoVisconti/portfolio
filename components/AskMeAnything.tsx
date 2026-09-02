@@ -103,7 +103,7 @@ export function AskMeAnything() {
         >
           {messages.length === 0 ? (
             <div>
-              <p className="mb-[26px] mt-0 max-w-[520px] font-display text-d-prompt text-[#7C8288] [text-wrap:pretty]">
+              <p className="mb-[26px] mt-0 max-w-[520px] font-display text-d-prompt text-ink-faint [text-wrap:pretty]">
                 {ASK.emptyPrompt}
               </p>
               <div className="flex flex-wrap gap-[9px]">
