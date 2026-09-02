@@ -22,9 +22,7 @@ jobs:
         with:
           node-version: '20'
           cache: npm
-      # `npm install`, not `npm ci`: package-lock.json still carries dependencies
-      # pruned in this branch. Regenerate the lock and this goes back to `npm ci`.
-      - run: npm install --no-audit --no-fund
+      - run: npm ci
       - run: npm run typecheck
       - run: npm run lint
       - run: npm run build
@@ -57,7 +55,16 @@ jobs:
       - uses: actions/checkout@v4
       # Every claim on this page is a link out. One that 404s costs more than a
       # lint error, and nothing else in this pipeline would catch it.
+      #
+      # The URLs live in .ts files, which lychee does not walk on its own - given
+      # a directory it found zero links and passed vacuously. Extracting them
+      # first makes the check deterministic and the input inspectable.
+      - name: Collect the URLs the page claims
+        run: |
+          grep -rhoE 'https?://[^"'"'"'`, )]+' lib/ README.md | sed 's/[.,)]*$//' | sort -u > links.txt
+          echo "found $(wc -l < links.txt) unique links"
+          cat links.txt
       - uses: lycheeverse/lychee-action@v2
         with:
-          args: --no-progress --accept 200,206,429 lib/ README.md
+          args: --no-progress --accept 200,206,429 --max-concurrency 4 links.txt
           fail: true
