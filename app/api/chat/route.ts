@@ -1,7 +1,7 @@
 import { GoogleGenerativeAI, type GenerationConfig } from '@google/generative-ai';
 import { NextResponse } from 'next/server';
 import { ASSISTANT_CONTEXT } from '@/lib/assistant-context';
-import { createRateLimiter, toGeminiHistory, type Msg } from '@/lib/chat';
+import { createRateLimiter, frameAnswer, toGeminiHistory, type Msg } from '@/lib/chat';
 
 export const runtime = 'nodejs';
 
@@ -48,6 +48,25 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'no messages' }, { status: 400 });
     }
 
+    // What visitors ask is the one dataset this site can generate about itself,
+    // and it answers the question the system prompt was written by guessing at:
+    // which facts people actually come here for. It goes to the runtime log
+    // rather than to a database, because the volume is tens of rows a month and
+    // this pipeline states the repo ships no backend, no database and no user
+    // data - buying storage for that would contradict the claim.
+    //
+    // The question text only. `ip` is in scope a few lines up and must never
+    // join this line: the rate limiter needs an address, the dataset does not,
+    // and a question next to an address is a different thing to hold than a
+    // question. Retention is the log's, which makes this a sample rather than a
+    // record - a log drain is the upgrade, and it is config, not code.
+    console.log(JSON.stringify({
+      evt: 'chat_q',
+      ts: new Date().toISOString(),
+      q: latest.parts[0].text,
+      prior: history.length,
+    }));
+
     const model = new GoogleGenerativeAI(key).getGenerativeModel({
       model: MODEL,
       systemInstruction: ASSISTANT_CONTEXT,
@@ -61,7 +80,7 @@ export async function POST(req: Request) {
         // SDK's types, hence the cast. The headroom below is the belt to that
         // brace: even if the field is dropped in transit, 2048 tokens leaves
         // room for a 2-5 sentence answer after any amount of thinking, and an
-        // empty body is now a 502 rather than a silent 200.
+        // answer of nothing is now an error event rather than a silent success.
         thinkingConfig: { thinkingBudget: 0 },
         maxOutputTokens: 2048,
         temperature: 0.4,
@@ -69,18 +88,44 @@ export async function POST(req: Request) {
     });
 
     const chat = model.startChat({ history });
-    const result = await chat.sendMessage(latest.parts[0].text);
-    const reply = result.response.text().trim();
+    // Anything that fails before the first byte still gets a status code, which
+    // is why this await sits out here rather than inside the stream. Past the
+    // first byte the status is spent and failure can only travel as an event.
+    const result = await chat.sendMessageStream(latest.parts[0].text);
 
-    // An empty body is a failure, not an answer. Returning 200 with '' makes
-    // the client fall back while the telemetry beside it reports a healthy
-    // round trip.
-    if (!reply) {
-      console.error('[api/chat] empty reply', result.response.candidates?.[0]?.finishReason);
-      return NextResponse.json({ error: 'empty' }, { status: 502 });
-    }
+    const encoder = new TextEncoder();
+    const lines = frameAnswer(result.stream, {
+      // finishReason is the only thing that says why the model returned nothing,
+      // and it rides on the aggregate response rather than on any chunk. Voided
+      // deliberately: this is a log line, and it must not become the reason the
+      // visitor gets nothing.
+      empty: () => void result.response
+        .then((r) => console.error('[api/chat] empty reply', r.candidates?.[0]?.finishReason))
+        .catch((err) => console.error('[api/chat] empty reply, and no aggregate', err)),
+      failed: (err) => console.error('[api/chat] stream', err),
+    });
 
-    return NextResponse.json({ reply });
+    // `pull` rather than a loop inside `start`: the next line is only framed
+    // once the previous one has been taken, so a slow reader does not get the
+    // whole answer queued into memory behind it.
+    return new Response(
+      new ReadableStream<Uint8Array>({
+        async pull(controller) {
+          const { value, done } = await lines.next();
+          if (done) controller.close();
+          else controller.enqueue(encoder.encode(value));
+        },
+        // A visitor who closes the tab mid-answer should stop the generation,
+        // not keep spending the day's allowance on nobody.
+        cancel: () => void lines.return(undefined),
+      }),
+      {
+        headers: {
+          'Content-Type': 'application/x-ndjson; charset=utf-8',
+          'Cache-Control': 'no-store',
+        },
+      },
+    );
   } catch (err) {
     console.error('[api/chat]', err);
     // The client owns the user-facing fallback copy (ASK.fallback).

@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { ASK } from '@/lib/content';
+import { createStreamReader, type StreamEvent } from '@/lib/chat';
 import { Reveal } from './Reveal';
 import { SectionHeader } from './SectionHeader';
 
@@ -16,15 +17,19 @@ export function AskMeAnything() {
   const [messages, setMessages] = useState<Msg[]>([]);
   // Only real answers go here. Error copy is shown in the transcript but must
   // never be replayed to the model as something the model said - it will build
-  // on "come back in an hour" as if it had written it.
+  // on "come back in an hour" as if it had written it. A half-streamed answer
+  // is excluded for the same reason: the model did not finish saying it.
   const sent = useRef<Msg[]>([]);
   const [busy, setBusy] = useState(false);
-  const [latency, setLatency] = useState<number | null>(null);
+  // Time to first token, not round-trip time. Once the answer arrives a word at
+  // a time, total duration stops being the number the visitor experiences.
+  const [ttft, setTtft] = useState<number | null>(null);
   const [turns, setTurns] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  // Instant, not animated — animated scroll fights the user.
+  // Instant, not animated — animated scroll fights the user. Runs on every
+  // token now, which is what keeps the newest line in view as the answer grows.
   useEffect(() => {
     const box = scrollRef.current;
     if (box) box.scrollTop = box.scrollHeight;
@@ -38,46 +43,96 @@ export function AskMeAnything() {
     const history = sent.current;
     setMessages((m) => [...m, { role: 'user', content: text }]);
     setBusy(true);
+    // The previous turn's number describes the previous turn. Clearing it means
+    // the row reads "—" while the answer is in flight rather than reporting a
+    // measurement it has not taken yet.
+    setTtft(null);
 
-    // eslint-disable-next-line react-hooks/purity -- ask() runs from the submit handler, never during render
     const t0 = performance.now();
-    let reply = ASK.fallback;
-    let answered = false;
+
+    let answer = '';        // what the model has said so far
+    let painted = false;    // whether the assistant turn exists in the transcript
+    let complete = false;   // the stream said `d`, so the answer is whole
+    let fallback = ASK.fallback;   // shown only if nothing streamed at all
+
+    // The assistant turn is appended by the first token and rewritten by every
+    // one after it. Deciding which outside the updater keeps it correct when
+    // React batches several tokens into one render.
+    const paint = (content: string) => {
+      const replace = painted;
+      painted = true;
+      setMessages((m) => (replace
+        ? [...m.slice(0, -1), { role: 'assistant' as const, content }]
+        : [...m, { role: 'assistant' as const, content }]));
+    };
+
+    const apply = (events: StreamEvent[]) => {
+      for (const event of events) {
+        if ('t' in event) {
+          if (!painted) {
+            setTtft(Math.round(performance.now() - t0));
+          }
+          answer += event.t;
+          paint(answer);
+        } else if ('e' in event) {
+          // A mid-stream failure cannot carry a status code - that was spent on
+          // the first byte - so it arrives as an event instead.
+          fallback = ASK.fallback;
+        } else {
+          complete = true;
+        }
+      }
+    };
+
     try {
       const res = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ messages: [...history, { role: 'user', content: text }] }),
       });
-      if (res.ok) {
-        const data = await res.json();
-        if (typeof data?.reply === 'string' && data.reply.trim()) {
-          reply = data.reply.trim();
-          answered = true;
+
+      if (res.ok && res.body) {
+        const reader = res.body.getReader();
+        const decoder = new TextDecoder();
+        const parser = createStreamReader();
+        for (;;) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          // `stream: true` so a multi-byte character split across two reads is
+          // held rather than decoded into a replacement character.
+          apply(parser.push(decoder.decode(value, { stream: true })));
         }
+        apply(parser.flush());
       } else if (res.status === 429) {
         // The guard is doing its job; saying "unreachable" would be a lie. The
         // two limits clear at different times, so they get different answers.
         const data = await res.json().catch(() => null);
-        reply = data?.error === 'daily_limit' ? ASK.dailyLimit : ASK.rateLimited;
+        fallback = data?.error === 'daily_limit' ? ASK.dailyLimit : ASK.rateLimited;
       } else if (res.status === 503) {
-        reply = ASK.unconfigured;
+        fallback = ASK.unconfigured;
       }
     } catch {
       /* keep fallback */
     }
 
-    // eslint-disable-next-line react-hooks/purity -- ask() runs from the submit handler, never during render
-    setLatency(Math.round(performance.now() - t0));
-    if (answered) {
-      sent.current = [...history, { role: 'user', content: text }, { role: 'assistant', content: reply }];
+    // Nothing reached the screen, so the fallback copy is the whole answer. If
+    // something did, the words already there are real model output and stay -
+    // replacing them with an apology would throw away a correct partial answer.
+    if (!painted) paint(fallback);
+
+    if (complete && answer) {
+      sent.current = [...history, { role: 'user', content: text }, { role: 'assistant', content: answer }];
     }
-    setMessages((m) => [...m, { role: 'assistant', content: reply }]);
     setTurns((t) => t + 1);
     setBusy(false);
   }
 
-  const status = busy ? 'GENERATING' : messages.length ? 'READY' : 'IDLE';
+  // Derived rather than stored: the assistant turn appears with the first token,
+  // so a trailing user turn is exactly the window where nothing has arrived yet.
+  const awaiting = busy && messages[messages.length - 1]?.role === 'user';
+  const status = awaiting
+    ? 'GENERATING'
+    : busy ? 'STREAMING' : messages.length ? 'READY' : 'IDLE';
 
   return (
     <section id="ask" className="py-section">
@@ -116,6 +171,12 @@ export function AskMeAnything() {
           ref={scrollRef}
           role="log"
           aria-live="polite"
+          // A polite region that mutates on every token would have a screen
+          // reader restarting the answer a word at a time. aria-busy is the
+          // standard way to say "still writing" - assistive tech holds the
+          // announcement until it clears, which is what keeps the live region
+          // added for the transcript useful rather than hostile.
+          aria-busy={busy}
           aria-label="Conversation"
           className="max-h-[420px] min-h-[280px] overflow-y-auto p-[clamp(22px,3vw,36px)]"
         >
@@ -155,7 +216,7 @@ export function AskMeAnything() {
             </div>
           ))}
 
-          {busy ? (
+          {awaiting ? (
             <div className="flex gap-4">
               <span className="flex-[0_0_62px] font-mono text-m-10-w font-medium tracking-t6 text-accent">
                 EV·AI
@@ -192,7 +253,7 @@ export function AskMeAnything() {
       <div className="flex flex-wrap gap-x-7 gap-y-[10px] pt-[14px] font-mono text-m-10-r tracking-t6 text-ink-faint">
         <span>MODEL · GEMINI</span>
         <span>TURNS · {String(turns).padStart(2, '0')}</span>
-        <span>LAST · {latency === null ? '—' : `${latency}ms`}</span>
+        <span>TTFT · {ttft === null ? '—' : `${ttft}ms`}</span>
         <span className="ml-auto">CONTEXT LOADED FROM MY OWN NOTES</span>
       </div>
     </section>
