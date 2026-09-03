@@ -3,30 +3,60 @@
     "collect": {
       "startServerCommand": "npm start",
       "startServerReadyPattern": "Ready in",
-      "url": ["http://localhost:3000/"],
+      "url": [
+        "http://localhost:3000/"
+      ],
       "numberOfRuns": 3,
-      "settings": { "preset": "desktop" }
+      "settings": {
+        "preset": "desktop"
+      }
     },
     "assert": {
       "assertions": {
-        "categories:accessibility": ["error", { "minScore": 0.95 }],
-        "categories:seo": ["error", { "minScore": 0.95 }],
-        "categories:performance": ["warn", { "minScore": 0.9 }],
-        "categories:best-practices": ["warn", { "minScore": 0.9 }],
-
-        "color-contrast": "error",
+        "categories:accessibility": [
+          "error",
+          {
+            "minScore": 0.95
+          }
+        ],
+        "categories:seo": [
+          "error",
+          {
+            "minScore": 0.95
+          }
+        ],
+        "categories:performance": [
+          "warn",
+          {
+            "minScore": 0.9
+          }
+        ],
+        "categories:best-practices": [
+          "warn",
+          {
+            "minScore": 0.9
+          }
+        ],
+        "color-contrast": [
+          "warn",
+          {
+            "minScore": 1
+          }
+        ],
         "heading-order": "error",
         "html-has-lang": "error",
         "image-alt": "error",
         "link-name": "error",
         "meta-description": "error",
         "document-title": "error",
-
         "unused-javascript": "off",
         "uses-long-cache-ttl": "off",
-        "csp-xss": "off"
+        "csp-xss": "off",
+        "_comment": "color-contrast warns rather than fails: Lighthouse audits without scrolling, so scroll-driven reveals below the fold are still on their from-state and axe measures text at opacity 0. The palette is asserted at the source by npm run invariants, which has no such blind spot."
       }
     },
-    "upload": { "target": "temporary-public-storage" }
+    "upload": {
+      "target": "temporary-public-storage"
+    }
   }
 }
