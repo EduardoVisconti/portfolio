@@ -130,7 +130,7 @@ pretending to be live.
 | `npm run dev` | Development server |
 | `npm run invariants` | The design rules, enforced |
 | `npm run typecheck` | `tsc --noEmit` |
-| `npm run lint` | `next lint` |
+| `npm run lint` | `eslint . --max-warnings=0` |
 | `npm run build` | Production build |
 
 ---

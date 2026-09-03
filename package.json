@@ -6,7 +6,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
+    "lint": "eslint . --max-warnings=0",
     "typecheck": "tsc --noEmit",
     "invariants": "node scripts/invariants.mjs",
     "test": "node --test --experimental-strip-types lib/chat.test.ts"
@@ -22,8 +22,8 @@
     "@types/node": "^20",
     "@types/react": "^19.2.18",
     "@types/react-dom": "^19.2.5",
-    "eslint": "^8",
-    "eslint-config-next": "^15.5.24",
+    "eslint": "^9",
+    "eslint-config-next": "^16",
     "postcss": "^8.5.26",
     "tailwindcss": "^3.4.1",
     "typescript": "^5"
