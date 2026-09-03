@@ -72,3 +72,24 @@ jobs:
           # real break elsewhere is not masked by a permissive status list.
           args: --no-progress --accept 200,206,429 --max-concurrency 4 --exclude 'linkedin\.com' links.txt
           fail: true
+
+  lighthouse:
+    name: lighthouse
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+      # The page claims its motion ships zero JavaScript and that only three
+      # components hold state. This is where those stop being claims. Built and
+      # served here rather than pointed at production, so the number belongs to
+      # the pull request rather than to whatever is already deployed.
+      - uses: treosh/lighthouse-ci-action@v12
+        with:
+          configPath: ./lighthouserc.json
+          uploadArtifacts: true
+          temporaryPublicStorage: true
