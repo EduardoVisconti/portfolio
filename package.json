@@ -6,28 +6,29 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "typecheck": "tsc --noEmit",
+    "invariants": "node scripts/invariants.mjs",
+    "test": "node --test --experimental-strip-types lib/chat.test.ts"
   },
   "dependencies": {
-    "@anthropic-ai/sdk": "^0.78.0",
     "@google/generative-ai": "^0.24.1",
-    "clsx": "^2.1.1",
-    "framer-motion": "^12.34.3",
-    "lucide-react": "^0.575.0",
-    "next": "14.2.35",
-    "react": "^18",
-    "react-dom": "^18",
-    "resend": "^6.9.2",
-    "tailwind-merge": "^3.5.0"
+    "@vercel/analytics": "^2.0.1",
+    "next": "^15.5.24",
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8"
   },
   "devDependencies": {
     "@types/node": "^20",
-    "@types/react": "^18",
-    "@types/react-dom": "^18",
+    "@types/react": "^19.2.18",
+    "@types/react-dom": "^19.2.5",
     "eslint": "^8",
-    "eslint-config-next": "14.2.35",
-    "postcss": "^8",
+    "eslint-config-next": "^15.5.24",
+    "postcss": "^8.5.26",
     "tailwindcss": "^3.4.1",
     "typescript": "^5"
+  },
+  "overrides": {
+    "postcss": "$postcss"
   }
 }

@@ -1,0 +1,74 @@
+name: CI
+
+# The site claims a CI gate that fails the pull request. This is that gate.
+# Scoped to what a portfolio actually needs: it does not ship a backend, a
+# database or user data, so there is no e2e suite and no schema check here.
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    name: invariants, tests, typecheck, lint, build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - run: npm run invariants
+      - run: npm run typecheck
+      - run: npm test
+      - run: npm run lint
+      - run: npm run build
+
+  secrets:
+    name: secret scan
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  vulnerabilities:
+    name: dependency audit
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: google/osv-scanner-action/osv-scanner-action@v2.2.4
+        with:
+          scan-args: |-
+            --lockfile=./package-lock.json
+
+  links:
+    name: external links resolve
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      # Every claim on this page is a link out. One that 404s costs more than a
+      # lint error, and nothing else in this pipeline would catch it.
+      #
+      # The URLs live in .ts files, which lychee does not walk on its own - given
+      # a directory it found zero links and passed vacuously. Extracting them
+      # first makes the check deterministic and the input inspectable.
+      - name: Collect the URLs the page claims
+        run: |
+          grep -rhoE 'https?://[^"'"'"'`, )]+' lib/ README.md public/llms.txt | sed 's/[.,)]*$//' | sort -u > links.txt
+          echo "found $(wc -l < links.txt) unique links"
+          cat links.txt
+      - uses: lycheeverse/lychee-action@v2
+        with:
+          # LinkedIn serves runner IPs a 999. Excluded rather than accepted, so a
+          # real break elsewhere is not masked by a permissive status list.
+          args: --no-progress --accept 200,206,429 --max-concurrency 4 --exclude 'linkedin\.com' links.txt
+          fail: true
