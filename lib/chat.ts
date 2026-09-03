@@ -194,9 +194,20 @@ export type TextChunk = { text: () => string };
  * so it leaves as an event. It also leaves without `d`, which is what keeps a
  * half-written answer out of the transcript history.
  */
+export type FrameHooks = {
+  /**
+   * The aggregate response's finish reason. A function rather than a value
+   * because it does not exist until the stream has been drained.
+   */
+  finishReason?: () => Promise<string | undefined>;
+  empty?: (reason?: string) => void;
+  truncated?: (reason: string) => void;
+  failed?: (err: unknown) => void;
+};
+
 export async function* frameAnswer(
   chunks: AsyncIterable<TextChunk>,
-  log: { empty?: () => void; failed?: (err: unknown) => void } = {},
+  hooks: FrameHooks = {},
 ): AsyncGenerator<string> {
   let emitted = false;
   try {
@@ -207,7 +218,20 @@ export async function* frameAnswer(
       yield ndjsonLine({ t: text });
     }
   } catch (err) {
-    log.failed?.(err);
+    hooks.failed?.(err);
+    yield ndjsonLine({ e: 'upstream' });
+    return;
+  }
+
+  // Reaching the end of the chunks is not the same as finishing. Gemini stops
+  // on maxOutputTokens - and on a safety or recitation trip - by ending the
+  // stream normally, and says so only on the aggregate, never on a chunk. Ten
+  // of its eleven finish reasons mean cut short.
+  let reason: string | undefined;
+  try {
+    reason = await hooks.finishReason?.();
+  } catch (err) {
+    hooks.failed?.(err);
     yield ndjsonLine({ e: 'upstream' });
     return;
   }
@@ -216,8 +240,20 @@ export async function* frameAnswer(
   // the console show a blank turn while the telemetry beside it reports a
   // healthy stream.
   if (!emitted) {
-    log.empty?.();
+    hooks.empty?.(reason);
     yield ndjsonLine({ e: 'empty' });
+    return;
+  }
+
+  // Absent is not evidence of truncation. Withholding `d` whenever the field is
+  // missing would silently end multi-turn context for every visitor over an SDK
+  // quirk, so only a named reason other than STOP counts as cut short.
+  if (reason && reason !== 'STOP') {
+    hooks.truncated?.(reason);
+    // The words stay on screen - the model really said them - but without `d`
+    // the client cannot commit them, so a half sentence is never replayed as a
+    // finished model turn.
+    yield ndjsonLine({ e: 'truncated' });
     return;
   }
 

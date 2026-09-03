@@ -298,3 +298,90 @@ test('what the route frames is exactly what the client reader reassembles', asyn
   assert.equal(painted, 'He owns the platform alone.');
   assert.ok(seen.some((e) => 'd' in e), 'and the client can tell the answer is whole');
 });
+
+test('running out of tokens is not the same as finishing', async () => {
+  // Gemini ends the stream normally on maxOutputTokens and says so only on the
+  // aggregate, never on a chunk. Marking that complete hands the client half a
+  // sentence to commit and replay as a finished model turn on the next
+  // question - the exact failure `d` exists to prevent.
+  let told = '';
+  const lines = await collect(frameAnswer(streamOf('He owns the platform al'), {
+    finishReason: async () => 'MAX_TOKENS',
+    truncated: (reason) => { told = reason; },
+  }));
+
+  assert.deepEqual(lines, [
+    ndjsonLine({ t: 'He owns the platform al' }),
+    ndjsonLine({ e: 'truncated' }),
+  ]);
+  assert.equal(told, 'MAX_TOKENS', 'and the reason reached the log');
+});
+
+test('a safety stop after real text is not a completion either', async () => {
+  // Ten of the eleven finish reasons mean cut short. MAX_TOKENS is the likely
+  // one here; this is the check that the test above is not a special case.
+  const lines = await collect(frameAnswer(streamOf('Partial '), {
+    finishReason: async () => 'SAFETY',
+  }));
+
+  assert.deepEqual(lines, [ndjsonLine({ t: 'Partial ' }), ndjsonLine({ e: 'truncated' })]);
+});
+
+test('a clean stop is what earns the completion marker', async () => {
+  const lines = await collect(frameAnswer(streamOf('A whole answer.'), {
+    finishReason: async () => 'STOP',
+  }));
+
+  assert.deepEqual(lines, [ndjsonLine({ t: 'A whole answer.' }), ndjsonLine({ d: 1 })]);
+});
+
+test('a missing finish reason does not withhold the completion marker', async () => {
+  // Absent is not evidence of truncation. Withholding `d` whenever the field is
+  // missing would silently end multi-turn context for every visitor over an SDK
+  // quirk, which is a wider failure than the one it would be guarding against.
+  const lines = await collect(frameAnswer(streamOf('A whole answer.'), {
+    finishReason: async () => undefined,
+  }));
+
+  assert.deepEqual(lines, [ndjsonLine({ t: 'A whole answer.' }), ndjsonLine({ d: 1 })]);
+});
+
+test('a finish reason that cannot be read is a failure, not a completion', async () => {
+  let failed: unknown = null;
+  const lines = await collect(frameAnswer(streamOf('Some text.'), {
+    finishReason: async () => { throw new Error('the aggregate never resolved'); },
+    failed: (err) => { failed = err; },
+  }));
+
+  assert.deepEqual(lines, [ndjsonLine({ t: 'Some text.' }), ndjsonLine({ e: 'upstream' })]);
+  assert.ok(failed instanceof Error, 'the reason reached the log');
+});
+
+test('an answer of nothing carries the reason it was nothing', async () => {
+  let seen: string | undefined = 'unset';
+  const lines = await collect(frameAnswer(streamOf(''), {
+    finishReason: async () => 'MAX_TOKENS',
+    empty: (reason) => { seen = reason; },
+  }));
+
+  assert.deepEqual(lines, [ndjsonLine({ e: 'empty' })]);
+  assert.equal(seen, 'MAX_TOKENS', 'the only clue why the model returned nothing');
+});
+
+test('a truncated answer reaches the client with its words and without permission to keep them', async () => {
+  // The whole chain, on the case that matters most: the visitor keeps what the
+  // model really said, and the client is told it may not commit it.
+  const reader = createStreamReader();
+  const seen: StreamEvent[] = [];
+
+  for await (const line of frameAnswer(streamOf('He owns the platform al'), {
+    finishReason: async () => 'MAX_TOKENS',
+  })) {
+    for (const byte of line) seen.push(...reader.push(byte));
+  }
+  seen.push(...reader.flush());
+
+  const painted = seen.filter((e): e is { t: string } => 't' in e).map((e) => e.t).join('');
+  assert.equal(painted, 'He owns the platform al', 'the words survive');
+  assert.ok(!seen.some((e) => 'd' in e), 'and the client cannot commit them');
+});

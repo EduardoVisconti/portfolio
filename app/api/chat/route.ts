@@ -95,13 +95,15 @@ export async function POST(req: Request) {
 
     const encoder = new TextEncoder();
     const lines = frameAnswer(result.stream, {
-      // finishReason is the only thing that says why the model returned nothing,
-      // and it rides on the aggregate response rather than on any chunk. Voided
-      // deliberately: this is a log line, and it must not become the reason the
-      // visitor gets nothing.
-      empty: () => void result.response
-        .then((r) => console.error('[api/chat] empty reply', r.candidates?.[0]?.finishReason))
-        .catch((err) => console.error('[api/chat] empty reply, and no aggregate', err)),
+      // The reason the generation ended rides on the aggregate rather than on
+      // any chunk, and does not exist until the stream is drained - which is
+      // exactly when frameAnswer asks for it. Anything but STOP was cut short:
+      // maxOutputTokens is the likely one here, a safety or recitation trip the
+      // rest. All of them end the stream without throwing, so this is the only
+      // thing standing between a truncated answer and a completion marker.
+      finishReason: async () => (await result.response).candidates?.[0]?.finishReason,
+      empty: (reason) => console.error('[api/chat] empty reply', reason),
+      truncated: (reason) => console.error('[api/chat] truncated', reason),
       failed: (err) => console.error('[api/chat] stream', err),
     });
 

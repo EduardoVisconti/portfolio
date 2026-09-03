@@ -114,9 +114,13 @@ a round trip the visitor would otherwise sit through. The frame carries an
 explicit completion marker, because a stream that simply ends is
 indistinguishable from one the network cut in half - and a half-written answer
 must not be committed to the history and replayed to the model as something it
-had finished saying. The parser is unit-tested against split chunks, malformed
-lines and a byte-at-a-time delivery; the model call above it is not, and cannot
-be without a live key.
+had finished saying. Reaching the end of the chunks is not what earns that
+marker: Gemini ends the stream normally when it runs out of output tokens, and
+on a safety or recitation trip, and says so only on the aggregate response - ten
+of its eleven finish reasons mean cut short, so the marker is withheld unless
+the reason is STOP. The framing and the parser are unit-tested against split
+chunks, malformed lines, every truncation reason and a byte-at-a-time delivery;
+the model call above them is not, and cannot be without a live key.
 
 **There is no contact form.** Delivering mail needs a verified sending domain and
 this site does not own one. A form that fails silently is worse than a link that
