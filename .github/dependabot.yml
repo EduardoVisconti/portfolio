@@ -1,0 +1,57 @@
+version: 2
+
+# Nothing in this repo was watching its own dependencies. That is fine for a
+# site with fourteen of them right up until one of them is the reason a tool
+# cannot be upgraded, which is issue #40: ESLint 10 is blocked because
+# eslint-plugin-react still calls context.getFilename(), removed in that major.
+# The fix is a release upstream, on a date nobody here can predict, and a repo
+# with no watcher finds out about it by someone remembering to look.
+#
+# Grouped rather than per-package: fourteen dependencies can produce fourteen
+# pull requests a week, and a maintainer who starts ignoring the bot has bought
+# nothing. Vulnerabilities are already handled in CI by osv-scanner against the
+# lockfile, so this file is about versions, not alerts.
+
+updates:
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      time: "13:00"
+      timezone: America/New_York
+    open-pull-requests-limit: 3
+    commit-message:
+      prefix: chore
+    groups:
+      # The group this file exists for. Kept apart from everything else so the
+      # release that unblocks ESLint 10 arrives as its own pull request instead
+      # of buried in a batch with a Next patch bump.
+      eslint:
+        patterns:
+          - eslint
+          - eslint-*
+          - "@eslint/*"
+      # Everything else, batched into one.
+      rest:
+        patterns:
+          - "*"
+        exclude-patterns:
+          - eslint
+          - eslint-*
+          - "@eslint/*"
+
+  # The pipeline pins seven third-party actions by major tag. They go stale the
+  # same way npm packages do, and unlike npm packages nothing else in CI is
+  # looking at them.
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: monthly
+    open-pull-requests-limit: 2
+    commit-message:
+      prefix: ci
+    groups:
+      actions:
+        patterns:
+          - "*"

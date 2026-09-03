@@ -53,11 +53,11 @@ flowchart TD
     subgraph client["Client components · the only three that hold state"]
         counter["Counter<br/>rAF, authored numeral first"]
         rail["SectionRail<br/>scroll position"]
-        ask["AskMeAnything<br/>transcript, latency"]
+        ask["AskMeAnything<br/>NDJSON reader, transcript, TTFT"]
     end
 
     subgraph server["Server"]
-        chat["/api/chat<br/>Node runtime, per-IP + daily guard"]
+        chat["/api/chat<br/>Node runtime, NDJSON stream<br/>per-IP + daily guard"]
         og["opengraph-image<br/>prerendered at build"]
     end
 
@@ -107,6 +107,20 @@ has to work without a paid API account. The route is public and unauthenticated,
 so it carries a per-IP sliding window and a daily ceiling, and a request that is
 turned away spends neither budget. Both counters are per-instance and therefore
 soft; a hard limit belongs at the edge.
+
+The answer arrives as NDJSON, one JSON object per line, so the transcript paints
+a token at a time and the telemetry row reports time to first token rather than
+a round trip the visitor would otherwise sit through. The frame carries an
+explicit completion marker, because a stream that simply ends is
+indistinguishable from one the network cut in half - and a half-written answer
+must not be committed to the history and replayed to the model as something it
+had finished saying. Reaching the end of the chunks is not what earns that
+marker: Gemini ends the stream normally when it runs out of output tokens, and
+on a safety or recitation trip, and says so only on the aggregate response - ten
+of its eleven finish reasons mean cut short, so the marker is withheld unless
+the reason is STOP. The framing and the parser are unit-tested against split
+chunks, malformed lines, every truncation reason and a byte-at-a-time delivery;
+the model call above them is not, and cannot be without a live key.
 
 **There is no contact form.** Delivering mail needs a verified sending domain and
 this site does not own one. A form that fails silently is worse than a link that
@@ -162,7 +176,7 @@ app/
   layout.tsx            fonts, metadata, JSON-LD
   opengraph-image.tsx   share card, prerendered at build
   robots.ts sitemap.ts
-  api/chat/route.ts     the console, with its rate guard
+  api/chat/route.ts     the console: NDJSON stream, rate guard
 components/             fifteen; three hold state
 lib/
   content.ts            single source of truth for every figure and string
