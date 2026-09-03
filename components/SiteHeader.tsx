@@ -6,12 +6,17 @@ export function SiteHeader() {
 
   return (
     <header className="fixed inset-x-0 top-0 z-[80] border-b border-soft bg-header backdrop-blur-[14px]">
-      <div className="mx-auto flex h-header max-w-container items-center gap-5 px-gutter">
+      <div className="mx-auto flex h-header max-w-container items-center gap-5 px-gutter max-[480px]:gap-3">
         <a href="#top" className="flex items-center gap-3">
           <span className="inline-flex h-6 w-6 items-center justify-center border border-mark font-mono text-m-10 font-medium tracking-t1 text-ink">
             EV
           </span>
-          <span className="font-mono text-m-12 font-medium tracking-t3 text-ink">
+          {/* Measured at 320px: the wordmark, four numbers and CONTACT need 421px
+              against 280px of content width. The page wrapper is overflow-x-hidden,
+              so the surplus is clipped rather than scrollable and CONTACT simply
+              disappears. The monogram carries the brand below 480px; the full name
+              is the first thing in the hero anyway. */}
+          <span className="font-mono text-m-12 font-medium tracking-t3 text-ink max-[480px]:hidden">
             EDUARDO VISCONTI
           </span>
         </a>
@@ -35,7 +40,7 @@ export function SiteHeader() {
       <nav
         data-mobilenav
         aria-label="Sections"
-        className="ml-auto hidden items-center gap-[14px] max-[780px]:flex"
+        className="ml-auto hidden items-center gap-[14px] max-[780px]:flex max-[480px]:gap-[10px]"
       >
         {SECTIONS.filter((s) => s.nav).map((s) => (
           <a
