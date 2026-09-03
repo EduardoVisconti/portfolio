@@ -129,10 +129,11 @@ check(
 const CONTENT_INK = ['DEFAULT', 'bright', 'mono', 'secondary', 'prose', 'muted', 'faint', 'dim', 'label', 'idle'];
 // Colours live in two files by design: lib/palette.ts holds the raw values that
 // tailwind.config.ts and the OG card both build from.
-const swatches = read('tailwind.config.ts') + '
-' + read('lib/palette.ts');
+const swatches = [read('tailwind.config.ts'), read('lib/palette.ts')].join('\n');
+// The boundary is explicit rather than \b: a key preceded by `{` or a comma is
+// not a word boundary the way it looks like it should be.
 const hexOf = (name) =>
-  swatches.match(new RegExp(`(?:^|[\s{,])${name}:\s*'(#[0-9a-fA-F]{6})'`, 'm'))?.[1];
+  swatches.match(new RegExp(`(?:^|[\\s{,])${name}:\\s*'(#[0-9a-fA-F]{6})'`, 'm'))?.[1];
 const luminance = (hex) => {
   const ch = [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16) / 255)
     .map((c) => (c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4));
