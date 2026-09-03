@@ -1,8 +1,9 @@
 /* Only what cannot be a utility: resets, keyframes, scroll-driven reveals. */
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+/* The theme is built from lib/palette.ts, so it stays in the JS config
+   instead of moving into @theme. That is invariant 4. */
+@config "../tailwind.config.ts";
 
 @layer base {
   :root { --accent: #C7F94A; }
@@ -76,8 +77,15 @@
                      animation-timeline: scroll(root); }
 
   /* Only two breakpoint rules in the whole design. */
-  @media (max-width: 1420px) { [data-rail]   { display: none !important; } }
-  @media (max-width: 780px)  { [data-topnav] { display: none !important; } }
+  @media (max-width: 1420px) { [data-rail] { display: none !important; } }
+  /* One query drives both navs. Tailwind 4 compiles max-[780px] to
+     `not all and (min-width:780px)`, which excludes 780 itself, so
+     splitting the pair across a utility left exactly 780px with no
+     navigation at all. */
+  @media (max-width: 780px) {
+    [data-topnav]    { display: none !important; }
+    [data-mobilenav] { display: flex !important; }
+  }
 
   /* Tap targets: chips must clear 44px on phones. */
   @media (max-width: 480px) { [data-chip] { padding-top: 13px; padding-bottom: 13px; } }

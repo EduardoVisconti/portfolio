@@ -40,7 +40,7 @@ export function SiteHeader() {
       <nav
         data-mobilenav
         aria-label="Sections"
-        className="ml-auto hidden items-center gap-[14px] max-[780px]:flex max-[480px]:gap-[10px]"
+        className="ml-auto hidden items-center gap-[14px] max-[480px]:gap-[10px]"
       >
         {SECTIONS.filter((s) => s.nav).map((s) => (
           <a
