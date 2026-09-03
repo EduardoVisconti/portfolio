@@ -72,3 +72,29 @@ jobs:
           # real break elsewhere is not masked by a permissive status list.
           args: --no-progress --accept 200,206,429 --max-concurrency 4 --exclude 'linkedin\.com' links.txt
           fail: true
+
+  lighthouse:
+    name: lighthouse
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+      # The page claims its motion ships zero JavaScript and that only three
+      # components hold state. This is where those stop being claims. Built and
+      # served here rather than pointed at production, so the number belongs to
+      # the pull request rather than to whatever is already deployed.
+      # color-contrast only warns: Lighthouse audits without scrolling, so the
+      # scroll-driven reveals below the fold are still on their from-state and
+      # axe measures text at opacity 0 - it reported the accent as #39471a.
+      # npm run invariants asserts the palette at the source instead, which has
+      # no such blind spot and fails rather than warns.
+      - uses: treosh/lighthouse-ci-action@v12
+        with:
+          configPath: ./lighthouserc.json
+          uploadArtifacts: true
+          temporaryPublicStorage: true

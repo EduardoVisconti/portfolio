@@ -122,12 +122,44 @@ check(
   `expected exactly 3 client components, found ${clients.length}: ${clients.join(', ')}`,
 );
 
-// 7. No dead links.
+// 7. Contrast, computed from the tokens rather than from a rendered page.
+//    Lighthouse cannot judge this here: it audits without scrolling, so every
+//    reveal below the fold is still on its from-state and axe measures text at
+//    opacity 0. Reading the palette at the source has no such blind spot.
+const CONTENT_INK = ['DEFAULT', 'bright', 'mono', 'secondary', 'prose', 'muted', 'faint', 'dim', 'label', 'idle'];
+// Colours live in two files by design: lib/palette.ts holds the raw values that
+// tailwind.config.ts and the OG card both build from.
+const swatches = [read('tailwind.config.ts'), read('lib/palette.ts')].join('\n');
+// The boundary is explicit rather than \b: a key preceded by `{` or a comma is
+// not a word boundary the way it looks like it should be.
+const hexOf = (name) =>
+  swatches.match(new RegExp(`(?:^|[\\s{,])${name}:\\s*'(#[0-9a-fA-F]{6})'`, 'm'))?.[1];
+const luminance = (hex) => {
+  const ch = [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16) / 255)
+    .map((c) => (c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4));
+  return 0.2126 * ch[0] + 0.7152 * ch[1] + 0.0722 * ch[2];
+};
+const ratio = (a, b) => {
+  const [x, y] = [luminance(a), luminance(b)].sort((m, n) => n - m);
+  return (x + 0.05) / (y + 0.05);
+};
+const bg = hexOf('bg');
+check(!!bg, 'tailwind.config.ts: no bg colour to measure contrast against');
+for (const name of CONTENT_INK) {
+  const hex = hexOf(name);
+  if (!hex) { check(false, `tailwind.config.ts: ink.${name} is gone`); continue; }
+  const r = ratio(hex, bg);
+  // `separator` is deliberately absent: it draws the "/" glyphs and the idle
+  // rail tick, both aria-hidden, and is decoration rather than text.
+  check(r >= 4.5, `ink.${name} (${hex}) is ${r.toFixed(2)}:1 on ${bg} - under the 4.5:1 the config documents as its floor`);
+}
+
+// 8. No dead links.
 for (const f of CODE) {
   check(!/href[:=]\s*['"]#['"]/.test(read(f)), `${f}: has a placeholder href`);
 }
 
-// 8. One spelling. The audience is American; mixed spelling in the sentence a
+// 9. One spelling. The audience is American; mixed spelling in the sentence a
 //    recruiter reads hardest is the kind of detail this page claims to care about.
 const BRITISH = /\b(authorised|normalised|colour|licence|favourite|behaviour|organis(e|ed|ation))\b/i;
 for (const f of ALL) {

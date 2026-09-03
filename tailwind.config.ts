@@ -23,7 +23,7 @@ const config: Config = {
           prose: '#9AA0A6',     // main reading grey
           muted: '#8A9096',     // nav, supporting copy
           faint: '#8A9096',     // indices, footer, telemetry — FLOOR for real text (AA)
-          idle: '#6E747A',      // rail idle, placeholders
+          idle: '#767C82',      // rail idle, placeholders
           dim: '#8A9096',       // work meta - carries the proof figures, so it clears AA
           label: '#7E848A',     // 10-11px caps labels ONLY - lifted above the floor
           separator: '#2A2E33', // "/" glyphs, rail tick idle
