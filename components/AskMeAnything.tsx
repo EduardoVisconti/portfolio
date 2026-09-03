@@ -39,6 +39,7 @@ export function AskMeAnything() {
     setMessages((m) => [...m, { role: 'user', content: text }]);
     setBusy(true);
 
+    // eslint-disable-next-line react-hooks/purity -- ask() runs from the submit handler, never during render
     const t0 = performance.now();
     let reply = ASK.fallback;
     let answered = false;
@@ -66,6 +67,7 @@ export function AskMeAnything() {
       /* keep fallback */
     }
 
+    // eslint-disable-next-line react-hooks/purity -- ask() runs from the submit handler, never during render
     setLatency(Math.round(performance.now() - t0));
     if (answered) {
       sent.current = [...history, { role: 'user', content: text }, { role: 'assistant', content: reply }];
