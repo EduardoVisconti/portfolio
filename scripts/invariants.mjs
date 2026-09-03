@@ -127,8 +127,12 @@ check(
 //    reveal below the fold is still on its from-state and axe measures text at
 //    opacity 0. Reading the palette at the source has no such blind spot.
 const CONTENT_INK = ['DEFAULT', 'bright', 'mono', 'secondary', 'prose', 'muted', 'faint', 'dim', 'label', 'idle'];
-const config = read('tailwind.config.ts');
-const hexOf = (name) => config.match(new RegExp(`\b${name}: '(#[0-9a-fA-F]{6})'`))?.[1];
+// Colours live in two files by design: lib/palette.ts holds the raw values that
+// tailwind.config.ts and the OG card both build from.
+const swatches = read('tailwind.config.ts') + '
+' + read('lib/palette.ts');
+const hexOf = (name) =>
+  swatches.match(new RegExp(`(?:^|[\s{,])${name}:\s*'(#[0-9a-fA-F]{6})'`, 'm'))?.[1];
 const luminance = (hex) => {
   const ch = [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16) / 255)
     .map((c) => (c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4));
