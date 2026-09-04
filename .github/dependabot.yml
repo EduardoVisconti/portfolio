@@ -8,19 +8,23 @@ version: 2
 # with no watcher finds out about it by someone remembering to look.
 #
 # Grouped rather than per-package: fourteen dependencies can produce fourteen
-# pull requests a week, and a maintainer who starts ignoring the bot has bought
-# nothing. Vulnerabilities are already handled in CI by osv-scanner against the
-# lockfile, so this file is about versions, not alerts.
+# pull requests a month, and a maintainer who starts ignoring the bot has bought
+# nothing. Majors are the exception - they arrive alone, because the first run
+# proved a batch is only as mergeable as its most blocked member.
+#
+# Vulnerabilities are already handled in CI by osv-scanner against the lockfile,
+# so this file is about versions, not alerts.
 
 updates:
   - package-ecosystem: npm
     directory: /
+    # Monthly, not weekly. Dependabot schedules per ecosystem rather than per
+    # group, so this is the eslint probe's cadence too - and that probe is
+    # waiting on an upstream release nobody can hurry. Polling it every week
+    # bought a failing pull request to close every week and no earlier answer.
     schedule:
-      interval: weekly
-      day: monday
-      time: "13:00"
-      timezone: America/New_York
-    open-pull-requests-limit: 3
+      interval: monthly
+    open-pull-requests-limit: 5
     commit-message:
       prefix: chore
     groups:
@@ -32,7 +36,12 @@ updates:
           - eslint
           - eslint-*
           - "@eslint/*"
-      # Everything else, batched into one.
+      # Everything else, batched into one - but minor and patch only. The
+      # first run put next 15 -> 16, typescript 5 -> 7 and @types/node 20 -> 26
+      # in a single pull request, which then failed on "typescript-eslint does
+      # not support TS 7.0" and took the other two down with it. One blocked
+      # major must not hold the rest hostage, so majors fall out of the group
+      # and arrive one pull request each, judged on their own.
       rest:
         patterns:
           - "*"
@@ -40,6 +49,9 @@ updates:
           - eslint
           - eslint-*
           - "@eslint/*"
+        update-types:
+          - minor
+          - patch
 
   # The pipeline pins seven third-party actions by major tag. They go stale the
   # same way npm packages do, and unlike npm packages nothing else in CI is
