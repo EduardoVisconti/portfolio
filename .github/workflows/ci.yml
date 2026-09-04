@@ -28,6 +28,13 @@ jobs:
       - run: npm test
       - run: npm run lint
       - run: npm run build
+      # next build writes to tracked files - it rewrote tsconfig.json on the
+      # move to 16, and CI passed anyway because typecheck runs before build and
+      # nothing afterwards looked. A bump that is half-applied leaves every
+      # local build with a dirty tree and the repo disagreeing with itself, so
+      # the tree is now asserted clean after the build rather than assumed.
+      - name: The build changed no tracked file
+        run: git diff --exit-code
 
   secrets:
     name: secret scan
