@@ -27,7 +27,7 @@
     "eslint-config-next": "^16",
     "postcss": "^8.5.26",
     "tailwindcss": "^4",
-    "typescript": "^5"
+    "typescript": "^7"
   },
   "overrides": {
     "postcss": "$postcss"
