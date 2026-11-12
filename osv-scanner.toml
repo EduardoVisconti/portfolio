@@ -1,0 +1,15 @@
+# Read by osv-scanner from the lockfile's directory, so the CI audit sees it.
+#
+# One advisory is waived, and it expires on its own so it cannot become
+# permanent by being forgotten. On that date the audit fails again and someone
+# has to look.
+
+[[IgnoredVulns]]
+id = "GHSA-g3hv-75wg-m249"
+ignoreUntil = 2027-02-12
+reason = """minimatch 10.2.6, dev only. The fix is minimatch 11.0.1, and all three \
+packages that resolve to this copy ask for 10: eslint (^10.2.6), @eslint/config-array \
+(^10.2.4) and @typescript-eslint/typescript-estree (^10.2.2). An override would force a \
+major none of them declares. Reachable only through glob patterns this repo writes into \
+its own lint config, never through site input. Drop this entry when the audit passes \
+without it."""

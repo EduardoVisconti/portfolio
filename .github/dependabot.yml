@@ -1,36 +1,48 @@
 version: 2
 
-# Nothing in this repo was watching its own dependencies. That is fine for a
-# site with fourteen of them right up until one of them is the reason a tool
-# cannot be upgraded, which is issue #40: ESLint 10 is blocked because
-# eslint-plugin-react still calls context.getFilename(), removed in that major.
-# The fix is a release upstream, on a date nobody here can predict, and a repo
-# with no watcher finds out about it by someone remembering to look.
+# Nothing in this repo was watching its own dependencies until issue #40, when
+# ESLint 10 was blocked by eslint-plugin-react calling context.getFilename().
+# eslint-config-next 16.4.0 fixed it upstream by putting the removed context
+# methods back for the plugins it bundles, five days after #55 failed on it.
+# A repo with no watcher finds out about a release like that by someone
+# remembering to look.
 #
 # Grouped rather than per-package: fourteen dependencies can produce fourteen
 # pull requests a month, and a maintainer who starts ignoring the bot has bought
 # nothing. Majors are the exception - they arrive alone, because the first run
 # proved a batch is only as mergeable as its most blocked member.
 #
-# Vulnerabilities are already handled in CI by osv-scanner against the lockfile,
-# so this file is about versions, not alerts.
+# This file is about versions. Vulnerabilities travel off this schedule, as
+# Dependabot security updates, which are switched on in the repository
+# settings. osv-scanner in CI fails a pull request that carries one, but a red
+# check on a bot pull request reads as the bot's problem. next 16.3.4 stayed in
+# production six weeks after its first critical advisory that way: security
+# updates were off, and the monthly pull request that did bump next was red on
+# the same audit as every other one.
 
 updates:
   - package-ecosystem: npm
     directory: /
     # Monthly, not weekly. Dependabot schedules per ecosystem rather than per
-    # group, so this is the eslint probe's cadence too - and that probe is
-    # waiting on an upstream release nobody can hurry. Polling it every week
-    # bought a failing pull request to close every week and no earlier answer.
+    # group, and security fixes do not wait for this, so weekly bought nothing
+    # but more pull requests to read.
     schedule:
       interval: monthly
     open-pull-requests-limit: 5
     commit-message:
       prefix: chore
+    # Types follow the oldest Node the site supports, not the newest Node.
+    # next requires >=20.9, so @types/node stays on 20 and code that typechecks
+    # runs on every supported runtime. It moves a major by hand, when the floor
+    # does. The first run offered 26, which describes APIs Node 20 does not have.
+    ignore:
+      - dependency-name: "@types/node"
+        update-types:
+          - version-update:semver-major
     groups:
-      # The group this file exists for. Kept apart from everything else so the
-      # release that unblocks ESLint 10 arrives as its own pull request instead
-      # of buried in a batch with a Next patch bump.
+      # Kept apart from everything else. ESLint plugins lag ESLint majors, and
+      # when one does, the lint bump should fail on its own instead of taking a
+      # Next patch down with it.
       eslint:
         patterns:
           - eslint
