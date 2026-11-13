@@ -1,17 +1,39 @@
-import { GoogleGenerativeAI, type GenerationConfig } from '@google/generative-ai';
+import { GoogleGenerativeAI } from '@google/generative-ai';
 import { NextResponse } from 'next/server';
 import { ASSISTANT_CONTEXT } from '@/lib/assistant-context';
-import { createRateLimiter, frameAnswer, toGeminiHistory, type Msg } from '@/lib/chat';
+import {
+  createRateLimiter,
+  firstAvailable,
+  frameAnswer,
+  toGeminiHistory,
+  type Msg,
+} from '@/lib/chat';
 
 export const runtime = 'nodejs';
 
 /**
  * Gemini, on the free tier: this console has to run without a paid API account,
  * and Google AI Studio grants a permanent free allowance (no card) that is far
- * more than a portfolio consumes. Flash is also the right shape for the job -
- * the system prompt asks for 2-5 sentences, so latency matters more than depth.
+ * more than a portfolio consumes. The key must come from a project with billing
+ * off - with billing on, every call draws on prepaid credit, and when that ran
+ * out the console went down with a 402 instead of falling back to free.
+ *
+ * The system prompt asks for 2-5 sentences, so latency matters more than
+ * depth, and Flash-Lite is the right shape: measured on 2026-11-13 it opened
+ * its stream in about half a second while Flash took 20 to 45 seconds or
+ * returned 503. Flash stays as the second choice for when Lite is the busy one.
+ * Both are `-latest` aliases, which follow Google's current model, so retiring
+ * one model name no longer takes the console down; an alias can still move to
+ * a model that behaves differently, which is what the fallback is for. Tried
+ * in order - see firstAvailable.
  */
-const MODEL = 'gemini-2.5-flash';
+const MODELS = ['gemini-flash-lite-latest', 'gemini-flash-latest'] as const;
+const HEADERS_MS = 10_000;     // Lite's wait before Flash steps in; Lite opened in ~0.5s
+
+// The last model has no deadline of its own (see firstAvailable), so this is
+// what bounds a visitor's wait. Sixty seconds is also the ceiling a Hobby
+// project allows without fluid compute, so the value is valid either way.
+export const maxDuration = 60;
 const MAX_TURNS = 12;          // conversation depth cap
 const MAX_CHARS = 1200;        // per-message input cap
 
@@ -67,31 +89,38 @@ export async function POST(req: Request) {
       prior: history.length,
     }));
 
-    const model = new GoogleGenerativeAI(key).getGenerativeModel({
-      model: MODEL,
+    const genAI = new GoogleGenerativeAI(key);
+    const open = (model: string, signal: AbortSignal) => genAI.getGenerativeModel({
+      model,
       systemInstruction: ASSISTANT_CONTEXT,
       generationConfig: {
-        // Thinking is on by default on 2.5 Flash and its tokens are billed
-        // against maxOutputTokens. Left alone the model can spend the whole
-        // budget reasoning and return MAX_TOKENS with no text - a 200 carrying
-        // an empty string, which the console then reports as an outage.
+        // There is deliberately no thinkingConfig. Each model accepts a
+        // different one - Flash-Lite rejects `thinkingBudget: 0` with a 400 and
+        // Flash rejects `thinkingLevel: 'minimal'` - so behind an alias that
+        // moves, any value is a future outage. Without it every model answered.
         //
-        // thinkingConfig is honoured by the REST API but absent from this
-        // SDK's types, hence the cast. The headroom below is the belt to that
-        // brace: even if the field is dropped in transit, 2048 tokens leaves
-        // room for a 2-5 sentence answer after any amount of thinking, and an
-        // answer of nothing is now an error event rather than a silent success.
-        thinkingConfig: { thinkingBudget: 0 },
+        // The cost: thinking tokens are billed against maxOutputTokens, and a
+        // model that reasons long enough can spend all 2048 and stop with
+        // MAX_TOKENS before its answer is done. Nothing here prevents that. A
+        // 2-5 sentence answer needs a small fraction of the budget, which makes
+        // it unlikely, and when it happens frameAnswer reports it as `empty` or
+        // `truncated` instead of passing it off as a finished answer.
         maxOutputTokens: 2048,
         temperature: 0.4,
-      } as GenerationConfig,
-    });
+      },
+    }).startChat({ history }).sendMessageStream(latest.parts[0].text, { signal });
 
-    const chat = model.startChat({ history });
     // Anything that fails before the first byte still gets a status code, which
     // is why this await sits out here rather than inside the stream. Past the
     // first byte the status is spent and failure can only travel as an event.
-    const result = await chat.sendMessageStream(latest.parts[0].text);
+    // That is also the only point where another model can still step in.
+    const gone = new AbortController();
+    req.signal.addEventListener('abort', () => gone.abort(), { once: true });
+    const result = await firstAvailable(MODELS, open, {
+      headersMs: HEADERS_MS,
+      gone: gone.signal,
+      skipped: (model, err) => console.error('[api/chat] skipped', model, err),
+    });
 
     const encoder = new TextEncoder();
     const lines = frameAnswer(result.stream, {
@@ -104,7 +133,10 @@ export async function POST(req: Request) {
       finishReason: async () => (await result.response).candidates?.[0]?.finishReason,
       empty: (reason) => console.error('[api/chat] empty reply', reason),
       truncated: (reason) => console.error('[api/chat] truncated', reason),
-      failed: (err) => console.error('[api/chat] stream', err),
+      // A visitor leaving aborts the stream on purpose; that is not a failure.
+      // The SDK still logs the aborted read once on its own, which no option
+      // of ours can silence.
+      failed: (err) => { if (!gone.signal.aborted) console.error('[api/chat] stream', err); },
     });
 
     // `pull` rather than a loop inside `start`: the next line is only framed
@@ -118,8 +150,13 @@ export async function POST(req: Request) {
           else controller.enqueue(encoder.encode(value));
         },
         // A visitor who closes the tab mid-answer should stop the generation,
-        // not keep spending the day's allowance on nobody.
-        cancel: () => void lines.return(undefined),
+        // not keep spending the day's allowance on nobody. Returning from
+        // `lines` alone stopped reading one half of the SDK's tee while the
+        // other kept downloading; aborting the fetch ends both.
+        cancel: () => {
+          gone.abort();
+          void lines.return(undefined);
+        },
       }),
       {
         headers: {

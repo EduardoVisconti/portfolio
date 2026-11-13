@@ -259,3 +259,61 @@ export async function* frameAnswer(
 
   yield ndjsonLine({ d: 1 });
 }
+
+export type FirstAvailableOptions = {
+  /** How long a model that is not the last may take to start its response. */
+  headersMs: number;
+  /**
+   * The visitor leaving. Aborts the attempt in flight - and, because the
+   * winner's signal stays linked, the answer already streaming - and stops the
+   * search, so nobody spends the free allowance on an empty tab.
+   */
+  gone?: AbortSignal;
+  skipped?: (model: string, err: unknown) => void;
+};
+
+/**
+ * Opens the answer on the first model that responds, in order. The free tier
+ * is shared capacity, and it fails per model: on 2026-11-13 the Flash models
+ * returned 503 "high demand" or took 20 to 45 seconds to start, while
+ * Flash-Lite answered at once. A single pinned model also retires - the 404
+ * that took the console down the same day was Google closing a model to new
+ * keys.
+ *
+ * Every error moves on to the next model. Sorting them is not worth it here: a
+ * bad key fails every model the same way, so trying the rest costs one wasted
+ * call before the route reports the failure it would have reported anyway.
+ *
+ * The deadline covers only the wait for the response headers - the SDK
+ * resolves there, before any text - which is why it is an AbortController of
+ * our own rather than the SDK's `timeout`: the SDK never clears its timer, so
+ * it would also cut an answer off halfway through streaming. The last model
+ * gets no deadline at all, because there is nothing left to move on to and
+ * abandoning it would only turn a slow answer into no answer; the route's
+ * maxDuration bounds that wait instead.
+ */
+export async function firstAvailable<T>(
+  models: readonly string[],
+  attempt: (model: string, signal: AbortSignal) => Promise<T>,
+  { headersMs, gone, skipped }: FirstAvailableOptions,
+): Promise<T> {
+  let last: unknown = new Error('no model to try');
+  for (const [i, model] of models.entries()) {
+    gone?.throwIfAborted();
+    const controller = new AbortController();
+    const stop = () => controller.abort();
+    gone?.addEventListener('abort', stop, { once: true });
+    const timer = i < models.length - 1 ? setTimeout(stop, headersMs) : undefined;
+    try {
+      return await attempt(model, controller.signal);
+    } catch (err) {
+      gone?.removeEventListener('abort', stop);
+      if (gone?.aborted) throw err;
+      last = err;
+      skipped?.(model, err);
+    } finally {
+      clearTimeout(timer);
+    }
+  }
+  throw last;
+}
