@@ -48,8 +48,6 @@ const config: Config = {
         titlebar: 'rgba(255,255,255,.015)',
         rowhover: 'rgba(255,255,255,.022)',
         rule: 'rgba(255,255,255,.09)',
-        bartrack: 'rgba(255,255,255,.09)',
-        barsource: 'rgba(255,255,255,.14)',
       },
       fontFamily: {
         display: ['var(--font-display)', 'Georgia', 'serif'],
@@ -59,12 +57,10 @@ const config: Config = {
       fontSize: {
         // Display — [size, { lineHeight, letterSpacing }]
         'd-name':    ['clamp(58px,12.4vw,182px)', { lineHeight: '.84',  letterSpacing: '-.035em' }],
-        'd-figure':  ['clamp(64px,10.5vw,148px)', { lineHeight: '.82',  letterSpacing: '-.035em' }],
         'd-contact': ['clamp(34px,5vw,68px)',     { lineHeight: '1',    letterSpacing: '-.03em'  }],
         'd-ask':     ['clamp(30px,4.4vw,60px)',   { lineHeight: '1.02', letterSpacing: '-.028em' }],
         'd-ledger':  ['clamp(34px,4vw,56px)',     { lineHeight: '.9',   letterSpacing: '-.03em'  }],
         'd-claim':   ['clamp(26px,3.4vw,44px)',   { lineHeight: '1.08', letterSpacing: '-.022em' }],
-        'd-denom':   ['clamp(26px,3.4vw,44px)',   { lineHeight: '1',    letterSpacing: '-.02em'  }],
         'd-project': ['clamp(30px,3.2vw,42px)',   { lineHeight: '1',    letterSpacing: '-.025em' }],
         'd-prompt':  ['clamp(21px,2.4vw,30px)',   { lineHeight: '1.24', letterSpacing: '-.018em' }],
         'd-stat':    ['30px',                     { lineHeight: '1',    letterSpacing: '-.02em'  }],

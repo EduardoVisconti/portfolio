@@ -20,8 +20,8 @@ import { IDENTITY, SITE } from '@/lib/content';
 
 const TITLE = 'Eduardo Visconti — AI Engineer · Full-Stack';
 const DESCRIPTION =
-  'Production systems where an LLM agent is part of the runtime. Budget ceilings, ' +
-  'approval gates, failure classification, self-healing.';
+  'AI engineer and full-stack developer. LLM agents with iteration caps and human ' +
+  'approval, and the apps people use them in.';
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE),

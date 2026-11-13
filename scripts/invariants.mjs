@@ -10,6 +10,7 @@
  */
 import { readFileSync, readdirSync, existsSync } from 'node:fs';
 import { join } from 'node:path';
+import { pathToFileURL } from 'node:url';
 
 const fail = [];
 const check = (ok, msg) => { if (!ok) fail.push(msg); };
@@ -29,7 +30,6 @@ const CODE = ['app', 'components', 'lib', 'scripts']
 const PROSE = ['README.md', 'CONTRIBUTING.md', 'public/llms.txt'].filter(existsSync);
 const ALL = [...CODE, ...PROSE];
 
-const content = read('lib/content.ts');
 const assistant = read('lib/assistant-context.ts');
 
 // 1. The site reads as someone with work, not someone seeking it. Standing
@@ -87,26 +87,61 @@ for (const f of CODE.filter((f) => !COLOUR_EXEMPT(f))) {
 }
 
 // 5. Figures are load-bearing. If one changes in content.ts and not in the
-//    assistant's context, the assistant contradicts the page out loud. Checked
-//    as label->value pairs: presence alone let the two numbers be swapped.
-const PAIRS = [
-  [/1,?271 of 1,?297|1,?271 commits/i, 'the 1,271 of 1,297 commit share'],
-  [/77 (vendor-portal )?integrations/i, 'the 77 integrations'],
-  [/3,?000\+? (US )?count/i, 'the 3,000+ counties'],
-  [/46 architecture decision/i, 'the 46 ADRs'],
-  [/120 pull requests/i, 'the 120 pull requests'],
-  [/93% merged?/i, 'the 93% merge rate'],
-  [/68,?672 lines of tests? against 50,?302 lines of source/i,
-   'the tests-against-source ratio, in that order'],
-  [/187 pull requests/i, 'the 187 Forja pull requests'],
-  [/32 pull requests/i, 'the 32 AI Hub pull requests'],
-  [/1,?300 unit and 200 end-to-end/i, 'the AI Hub test counts'],
+//    assistant's context, the assistant contradicts the page out loud. The
+//    ledger is the source: it is imported, not grepped, so every row is checked
+//    as a value with its suffix, and every other place the page states a figure
+//    is checked against it. A list typed here would let a row drift past it.
+const { HERO, NUMBERS, WORK, STACK, ASK } = await import(
+  pathToFileURL(join(process.cwd(), 'lib/content.ts')).href
+);
+const llms = read('public/llms.txt');
+const fmt = (row) => row.value.toLocaleString('en-US') + row.suffix;
+const esc = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+// Bounded on both sides, so "70+" is not found inside "170+" and "60" is not
+// found inside "600".
+const figure = (f) => `(?<![\\d,.])${esc(f)}(?![\\d,])`;
+// The words that say what each figure counts. A row with no key fails, so a new
+// row cannot slip in unpaired.
+const KEYS = [
+  [/platforms/i, 'records-portal platforms'],
+  [/counties/i, 'counties set up'],
+  [/decision records/i, 'architecture decision records'],
+  [/shipped image/i, 'tests run inside the shipped image'],
+  [/AI Hub/, 'employees'],
+  [/Forja/, 'tests'],
 ];
-for (const [re_, what] of PAIRS) {
-  check(re_.test(assistant), `lib/assistant-context.ts: missing or reworded ${what}`);
+const ledgerFigures = new Set(NUMBERS.ledger.map(fmt));
+for (const row of NUMBERS.ledger) {
+  const key = KEYS.find(([re_]) => re_.test(row.label))?.[1];
+  check(!!key, `lib/content.ts: ledger row "${row.label}" has no key in invariants.mjs`);
+  if (!key) continue;
+  const said = new RegExp(`${figure(fmt(row))}[^.]{0,30}${esc(key)}`, 'i');
+  check(said.test(assistant), `lib/assistant-context.ts: does not say ${fmt(row)} ${key}`);
+  check(said.test(llms), `public/llms.txt: does not say ${fmt(row)} ${key}`);
 }
-for (const n of ['1271', '1297', '77', '3000', '46', '120', '93', '68672', '50302', '187']) {
-  check(content.includes(n), `lib/content.ts: lost the figure ${n}`);
+// The hero repeats the first four ledger rows.
+HERO.stats.forEach((s, i) => {
+  check(fmt(s) === fmt(NUMBERS.ledger[i]),
+    `lib/content.ts: hero stat ${s.label} says ${fmt(s)}, ledger row ${i + 1} says ${fmt(NUMBERS.ledger[i])}`);
+});
+// Short labels elsewhere on the page may only state a ledger figure. In a tag
+// the count is the number that opens it ("70+ PLATFORMS", "ABOUT 60 USERS"), so
+// a version like "NEXT.JS 16" is not read as one; a question can put it anywhere.
+const counts = [
+  ...[...WORK.flatMap((w) => w.meta), ...STACK.flatMap((r) => ('qualifiers' in r ? r.qualifiers : []))]
+    .map((label) => [label, label.match(/^(?:about\s+)?(\d[\d,]*\+?)/i)?.[1]]),
+  ...ASK.chips.flatMap((chip) => [...chip.matchAll(/(?<![\d,.])\d[\d,]*\+?/g)].map(([n]) => [chip, n])),
+].filter(([, n]) => n);
+for (const [label, n] of counts) {
+  check(ledgerFigures.has(n), `lib/content.ts: "${label}" states ${n}, which is not a ledger figure`);
+}
+// Figures inside the work descriptions, with the word after them, must be in
+// the assistant's context too ("10 to 30 minutes", "42 years", "75% of").
+for (const w of WORK) {
+  for (const [, n, word] of w.description.matchAll(/(?<![\d,.])(\d[\d,]*\+?%?)\s+(\w+)/g)) {
+    check(new RegExp(`${figure(n)}\\s+${esc(word)}\\b`).test(assistant),
+      `lib/assistant-context.ts: does not say "${n} ${word}" (${w.title})`);
+  }
 }
 
 // 6. The page's motion ships zero JS. This is a count, not a permission list -

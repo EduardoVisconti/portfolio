@@ -13,7 +13,7 @@ export const IDENTITY = {
   location: 'TAMPA, FL',
   languages: 'EN · PT · ES',
   email: 'eduardo.visconti.dev@gmail.com',
-  title: 'Full-Stack Engineer',
+  title: 'AI Developer',
   employer: 'United Financial Resources',
   employerCity: 'Bradenton, FL',
   since: 'April 2026',
@@ -28,36 +28,34 @@ export const HERO = {
   ledeAccent: 'LLM agent is part of the runtime',
   ledeAfter: ' — not a demo bolted to the side of one.',
   now:
-    `AI Engineer at ${IDENTITY.employer} since ${IDENTITY.since}, working as a ` +
-    'Full-Stack Engineer across a Python backend and a TypeScript front end. ' +
+    `${IDENTITY.title} at ${IDENTITY.employer} since ${IDENTITY.since}, working ` +
+    'across a Python backend and a TypeScript frontend. ' +
     'Five years at Tesla before software; self-taught into it from 2021.',
   support:
-    'Budget ceilings. Human approval gates. Failure classification. Self-healing ' +
-    'when an upstream source changes shape. Front-end is my favorite half of ' +
+    'The deed agent is capped by iterations, and a person approves any change to ' +
+    'how a county is validated or searched. Frontend is my favorite half of ' +
     'full-stack, so this page is a work sample too.',
   stats: [
-    { label: 'INTEGRATIONS',     value: 77,    suffix: '' },
-    { label: 'US COUNTIES',      value: 3000,  suffix: '+' },
-    { label: 'DECISION RECORDS', value: 46,    suffix: '' },
-    { label: 'LINES OF TESTS',   value: 68672, suffix: '' },
+    { label: 'PORTAL PLATFORMS', value: 70,   suffix: '+' },
+    { label: 'COUNTIES SET UP',  value: 840,  suffix: '+' },
+    { label: 'DECISION RECORDS', value: 60,   suffix: '' },
+    { label: 'TESTS PER PR',     value: 7500, suffix: '+' },
   ],
 } as const;
 
 export const NUMBERS = {
-  commits:      { value: 1271, of: 1297, pct: '98.0%' },
-  commitsLabel: 'COMMITS · PRODUCTION DEED-RETRIEVAL PLATFORM · SOLE ENGINEER',
-  code: {
-    caption: 'TEST SURFACE VS SOURCE SURFACE',
-    tests:  { label: 'TESTS',  value: 68672, width: '100%' },
-    source: { label: 'SOURCE', value: 50302, width: '73.2%' }, // 50302 / 68672
-    ratio: '1.37×',
-  },
   ledger: [
-    { label: 'Vendor-portal integrations behind one dispatcher', value: 77,   suffix: '' },
-    { label: 'Nationwide US county coverage',                    value: 3000, suffix: '+' },
-    { label: 'Architecture decision records written',            value: 46,   suffix: '' },
-    { label: 'Pull requests shipped', qualifier: '· 93% merged', value: 120,  suffix: '' },
-    { label: 'Pull requests on Forja', qualifier: '· my own product', value: 187, suffix: '' },
+    { label: 'Records-portal platforms with an automated integration', value: 70, suffix: '+' },
+    { label: 'Counties set up for automated search', value: 840, suffix: '+' },
+    { label: 'Architecture decision records written', value: 60, suffix: '' },
+    { label: 'Tests run inside the shipped image on every pull request', value: 7500, suffix: '+' },
+    {
+      label: 'Employees on AI Hub, the platform whose frontend I lead',
+      qualifier: '· approximate',
+      value: 60,
+      suffix: '',
+    },
+    { label: 'Tests on Forja', qualifier: '· my own product', value: 5000, suffix: '+' },
   ],
 } as const;
 
@@ -90,7 +88,7 @@ export const THINKING = [
     n: '03',
     project: 'FORJA',
     category: 'STRUCTURE · CI',
-    claim: 'Layer boundaries are enforced by a CI gate that fails the pull request.',
+    claim: 'A CI gate blocks screens and components from importing services or the database client directly.',
     because:
       'A written-down rule decays within a month. An architecture is only real if ' +
       'something mechanical refuses the commit that breaks it — the gate is the ' +
@@ -115,14 +113,18 @@ export type WorkItem = {
 export const WORK: WorkItem[] = [
   {
     title: 'Forja',
-    period: '2026 — NOW',
-    kicker: 'MY OWN PRODUCT · SHIPPING',
+    period: 'MAR 2026 — NOW',
+    kicker: 'MY OWN PRODUCT · IOS BETA',
     kickerAccent: true,
     description:
-      'Built end to end and still shipping: web app, native iOS build on TestFlight, ' +
-      'and a written case study on the architecture behind it. The place I get to make ' +
-      'the boundary calls with nobody to argue with but future me.',
-    meta: ['187 PULL REQUESTS', 'REACT NATIVE', 'NEXT.JS', 'POSTGRESQL RLS'],
+      'A training app for people who take training seriously and mix lifting, HYROX, ' +
+      'functional work and running. Workouts, cardio, programs, habits, body weight and ' +
+      'progress live in one app, and the whole workout fits on one screen like a ' +
+      'spreadsheet, edited with a tap. I tested the popular apps and none of them covered ' +
+      'all of it, so I built Forja from what each one did best. The iOS beta on TestFlight ' +
+      'is open to anyone with the link and has 10 testers, and the web app is live. A full ' +
+      'redesign is in progress.',
+    meta: ['5,000+ TESTS', 'OFFLINE-FIRST', 'REACT NATIVE', 'SUPABASE'],
     links: [
       { label: 'LIVE APP ↗', href: 'https://app.forjahybrid.com', external: true },
       { label: 'TESTFLIGHT ↗', href: 'https://testflight.apple.com/join/bRREz5sS', external: true },
@@ -142,13 +144,14 @@ export const WORK: WorkItem[] = [
   {
     title: 'Deed Retrieval Platform',
     period: 'APR 2026 — NOW',
-    kicker: 'SOLE ENGINEER · PRODUCTION',
+    kicker: 'BUILT FROM SCRATCH · OWNER',
     description:
-      'An agent-driven retrieval system running against 77 county and vendor portals ' +
-      'through one dispatcher, nationwide. Budget ceilings per run, human approval ' +
-      'gates before anything irreversible, failure classified rather than retried ' +
-      'blindly, and self-healing when an upstream page changes shape.',
-    meta: ['1,271 COMMITS', '77 INTEGRATIONS', '3,000+ COUNTIES', '46 ADRs'],
+      'Built to replace a deed lookup that takes someone 10 to 30 minutes by hand. Given ' +
+      "an owner and a county, it finds the county's records portal, logs in, runs the " +
+      'search, checks the PDF and returns the deed to AI Hub or the company CRM. When a ' +
+      'portal breaks, an agent capped by iterations diagnoses it and proposes a fix, and ' +
+      "a person approves any change to a county's validation or retrieval settings.",
+    meta: ['70+ PLATFORMS', '840+ COUNTIES', '60 ADRs', '7,500+ TESTS'],
     privateBadge: {
       label: 'SOURCE PRIVATE',
       note: 'Described by scale, not screenshots. Happy to walk through the architecture live.',
@@ -157,62 +160,73 @@ export const WORK: WorkItem[] = [
   {
     title: 'AI Hub',
     period: 'APR 2026 — NOW',
-    kicker: 'TEAM · IN PRODUCTION',
+    kicker: 'FRONTEND LEAD · IN PRODUCTION',
     description:
-      'The internal multi-agent platform several departments run on. I build the ' +
-      'client: Next.js and React 19, a custom NDJSON streaming protocol, the state ' +
-      'architecture and the artifact rendering layer, against a Python/FastAPI/Agno ' +
-      'backend with role-based access and a retrieval pipeline. Shipped through ' +
-      'review by three engineers, on a suite of 1,300 unit and 200 end-to-end tests.',
-    meta: ['32 PULL REQUESTS', 'NDJSON STREAMING', 'NEXT.JS', 'FASTAPI'],
+      "The company's internal multi-agent chat platform, used by about 60 employees. I " +
+      'lead the frontend: I redesigned the whole interface on my own, built how people ' +
+      'organize their work in projects and pinned and archived chats, fixed a streaming ' +
+      'race that lost or merged up to 75% of agent replies, and wrote the MCP server that ' +
+      'lets its agents search for deeds.',
+    meta: ['ABOUT 60 USERS', 'FRONTEND LEAD', 'NEXT.JS 16', 'MCP'],
     privateBadge: {
       label: 'INTERNAL',
-      note: 'Company platform, so no link. Happy to walk through the streaming protocol live.',
+      note: 'Company platform, so no link and no screenshots. Happy to walk through the streaming fix live.',
     },
+  },
+  {
+    title: 'ConsciencIA',
+    period: 'SEP 2026 — NOW',
+    kicker: 'CLIENT WORK · LIVE',
+    description:
+      "A private journaling app where a psychology practice's patients get AI feedback on " +
+      'what they write. Entries are encrypted at rest, patients consent item by item and ' +
+      'are asked again only when the consent text changes, and the AI key never reaches ' +
+      'the browser. It lives in its own repository, apart from the practice site, so ' +
+      'access to the site never grants access to code that handles health data.',
+    meta: ['ASTRO', 'PHP + MYSQL', 'ENCRYPTED AT REST', 'CONSENT BY ITEM'],
+    privateBadge: {
+      label: 'CLIENT · PRIVATE',
+      note: 'The app holds patient data, so the screens are its public landing. Happy to walk through the consent model live.',
+    },
+    shots: [
+      {
+        src: '/work/consciencia-1-landing.jpg',
+        w: 1216,
+        h: 760,
+        alt: 'Landing page with a sample entry and the feedback it gets',
+      },
+      {
+        src: '/work/consciencia-2-example.jpg',
+        w: 349,
+        h: 760,
+        alt: 'The same sample entry and feedback on a phone',
+      },
+    ],
   },
   {
     title: 'Sueli Repulho',
     period: '2025 — NOW',
-    kicker: 'CLIENT WORK · SHIPPED',
+    kicker: 'CLIENT WORK',
     description:
-      'Practice site and the subscription product beside it, for a clinical ' +
-      'psychologist with 42 years of practice. Two registers on one type system: a ' +
-      'warm editorial site built to convert, and a dark, quiet product for writing ' +
-      'in. Design, build and delivery were all mine.',
-    meta: ['ASTRO', 'DESIGN SYSTEM', 'SEO-FIRST', 'CI SECURITY GATES'],
-    links: [
-      { label: 'LIVE SITE ↗', href: 'https://suelirepulho.com.br', external: true },
-    ],
+      'The website and course sales pages for a clinical psychologist with 42 years of ' +
+      'practice. A static Astro build for a shared host with no Node, so the only backend ' +
+      'is a PHP lead form with a honeypot, an origin check, dedup and two rate limits. ' +
+      "Google's tags load only after the visitor accepts, and end-to-end tests run on " +
+      'desktop and mobile.',
+    meta: ['ASTRO', 'PHP + MYSQL', 'CONSENT MODE', 'CI SECURITY GATES'],
     shots: [
-      { src: '/work/sueli-1-home.jpg', w: 1216, h: 760, alt: 'Practice home page, built for conversion' },
-      { src: '/work/sueli-2-app.jpg', w: 1216, h: 760, alt: 'ConsciencIA: the subscription product, same type system inverted' },
-    ],
-  },
-  {
-    title: 'LeadFlow CRM',
-    period: '2025',
-    kicker: 'CLIENT PLATFORM · OPEN SOURCE',
-    description:
-      'A full CRM for electronics resellers — drag-and-drop pipeline, contact and ' +
-      'product database with stock, tasks with overdue alerts, and model-scored deal ' +
-      'health. The one in this list you can open and click through right now.',
-    meta: ['NEXT.JS', 'SUPABASE', 'TANSTACK QUERY', 'GEMINI API'],
-    links: [
-      { label: 'LIVE DEMO ↗', href: 'https://leadflow-electronics.vercel.app', external: true },
-      { label: 'SOURCE ↗',    href: 'https://github.com/EduardoVisconti/leadflow', external: true },
-    ],
-    shots: [
-      { src: '/work/leadflow-1-dashboard.jpg', w: 1216, h: 760, alt: 'Pipeline dashboard: figures, recent deals and open tasks' },
+      { src: '/work/sueli-site-1-home.jpg', w: 1216, h: 760, alt: 'Practice home page, built for conversion' },
+      { src: '/work/sueli-site-2-home-phone.jpg', w: 349, h: 760, alt: 'The same home page on a phone' },
     ],
   },
 ];
 
 export const STACK = [
-  { layer: 'AGENT',     accent: true, items: ['Anthropic tool-use', 'OpenAI tool-use', 'MCP', 'RAG'] },
+  { layer: 'AGENT',     accent: true, items: ['LLM agents', 'Tool calling', 'MCP', 'LiteLLM'], qualifiers: ['self-hosted models'] },
   { layer: 'RUNTIME',   items: ['Python', 'FastAPI', 'asyncio', 'Docker', 'GitHub Actions'] },
   { layer: 'DATA',      items: ['PostgreSQL'], qualifiers: ['row-level security'] },
-  { layer: 'INTERFACE', items: ['TypeScript', 'React', 'React Native', 'Next.js'] },
-  { layer: 'PROOF',     items: ['pytest', 'Playwright'], qualifiers: ['68,672 lines of it'] },
+  { layer: 'INTERFACE', items: ['TypeScript', 'React', 'React Native', 'Expo', 'Next.js'] },
+  { layer: 'PROOF',     items: ['pytest', 'Playwright', 'Vitest'], qualifiers: ['7,500+ tests in the shipped image'] },
 ] as const;
 
 export const ASK = {
@@ -226,9 +240,9 @@ export const ASK = {
   emptyPrompt:
     "Ask about the architecture, the failure modes, the hiring fit — or the parts I can't show you.",
   chips: [
-    'How do you stop an agent burning budget?',
-    'What breaks at 77 integrations?',
-    'Why more test than source?',
+    'How do you keep an agent from changing the wrong thing?',
+    'What breaks across 70+ portal platforms?',
+    'Why run the tests inside the shipped image?',
     'Is he senior enough for an AI platform role?',
   ],
   placeholder: 'Type a question…',
