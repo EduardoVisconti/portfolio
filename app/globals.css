@@ -15,7 +15,7 @@
     margin: 0;
   }
 
-  /* Users add links over time — never leave them browser-blue. */
+  /* Users add links over time; never leave them browser-blue. */
   a { color: inherit; text-decoration: none; transition: color .2s ease; }
   a:hover { color: var(--accent); }
 

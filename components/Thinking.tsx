@@ -20,7 +20,7 @@ export function Thinking() {
         className="m-0 mb-[clamp(48px,6vw,84px)] max-w-[640px] text-p-intro text-ink-muted [text-wrap:pretty]"
       >
         My strongest work is private. So instead of screenshots, here are three decisions I
-        actually made — each one a class of bug that would otherwise have shipped green.
+        actually made: each one a class of bug that would otherwise have shipped green.
       </Reveal>
 
       {THINKING.map((adr, i) => (

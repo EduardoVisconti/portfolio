@@ -26,7 +26,7 @@ export const IDENTITY = {
 export const HERO = {
   ledeBefore: 'I build production systems where an ',
   ledeAccent: 'LLM agent is part of the runtime',
-  ledeAfter: ' — not a demo bolted to the side of one.',
+  ledeAfter: ', not a demo bolted to the side of one.',
   now:
     `${IDENTITY.title} at ${IDENTITY.employer} since ${IDENTITY.since}, working ` +
     'across a Python backend and a TypeScript frontend. ' +
@@ -70,7 +70,7 @@ export const THINKING = [
     claim: 'Deletions sync as tombstones, under the same last-write-wins rule as any write.',
     because:
       'A delete that is merely an absence is indistinguishable from a record the peer ' +
-      'has not seen yet. Treat it as absence and the row resurrects on the next sync — ' +
+      'has not seen yet. Treat it as absence and the row resurrects on the next sync, ' +
       "silently, on someone else's device, with no error anywhere in the log.",
   },
   {
@@ -79,7 +79,7 @@ export const THINKING = [
     category: 'TIME · TEST DESIGN',
     claim: 'Date-sensitive tests run in a non-UTC timezone. Always.',
     because:
-      'A suite running in UTC cannot tell local day from UTC day — the two are the same ' +
+      'A suite running in UTC cannot tell local day from UTC day: the two are the same ' +
       'number, so every off-by-one-day bug passes CI and ships. Move the runner to ',
     becauseMono: 'Asia/Tokyo',
     becauseAfter: ' and the class of bug stops being invisible.',
@@ -91,7 +91,7 @@ export const THINKING = [
     claim: 'A CI gate blocks screens and components from importing services or the database client directly.',
     because:
       'A written-down rule decays within a month. An architecture is only real if ' +
-      'something mechanical refuses the commit that breaks it — the gate is the ' +
+      'something mechanical refuses the commit that breaks it: the gate is the ' +
       'document, the markdown is the footnote.',
   },
 ] as const;
@@ -234,11 +234,11 @@ export const ASK = {
   headAccent: 'Interrogate',
   headAfter: ' the site.',
   support:
-    'A real model-backed route with my context loaded — the same one running in ' +
+    'A real model-backed route with my context loaded, the same one running in ' +
     "production here. If you're screening me, this is faster than the résumé and it " +
     'answers follow-ups.',
   emptyPrompt:
-    "Ask about the architecture, the failure modes, the hiring fit — or the parts I can't show you.",
+    "Ask about the architecture, the failure modes, the hiring fit, or the parts I can't show you.",
   chips: [
     'How do you keep an agent from changing the wrong thing?',
     'What breaks across 70+ portal platforms?',

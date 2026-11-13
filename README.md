@@ -1,4 +1,4 @@
-![Eduardo Visconti — AI Engineer, Full-Stack](docs/site.jpg)
+![Eduardo Visconti: AI Engineer, Full-Stack](docs/site.jpg)
 
 # eduardo-visconti.vercel.app
 
@@ -132,7 +132,7 @@ works, so section 07 is an email address and two links.
 
 ```bash
 npm ci
-cp .env.example .env.local   # GEMINI_API_KEY — free, no card, aistudio.google.com/apikey
+cp .env.example .env.local   # GEMINI_API_KEY: free, no card, aistudio.google.com/apikey
 npm run dev
 ```
 
@@ -153,11 +153,11 @@ pretending to be live.
 
 Every pull request runs, and must pass:
 
-- **invariants** — the rules in [`CONTRIBUTING.md`](CONTRIBUTING.md), as a script
+- **invariants**: the rules in [`CONTRIBUTING.md`](CONTRIBUTING.md), as a script
 - **typecheck, lint, build**
-- **gitleaks** — secret scan over full history
-- **osv-scanner** — dependency advisories
-- **lychee** — every external URL the page claims still resolves
+- **gitleaks**: secret scan over full history
+- **osv-scanner**: dependency advisories
+- **lychee**: every external URL the page claims still resolves
 
 The last one earns its place: every claim here is a link out, a 404 costs more
 than a lint error, and nothing else in the pipeline would catch it.
@@ -198,4 +198,4 @@ prose is a rule that decays, which is the argument the site itself makes.
 
 ## License
 
-No license. All rights reserved — this is a personal site, not a template.
+No license. All rights reserved: this is a personal site, not a template.

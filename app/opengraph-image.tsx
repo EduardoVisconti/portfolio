@@ -7,7 +7,7 @@ import { PALETTE } from '@/lib/palette';
  * keep in sync with the page. Deliberately no web font: a font fetch is one
  * more thing that can fail and leave a blank card.
  */
-export const alt = 'Eduardo Visconti — AI Engineer, Full-Stack';
+export const alt = 'Eduardo Visconti: AI Engineer, Full-Stack';
 export const size = { width: 1200, height: 630 };
 export const contentType = 'image/png';
 

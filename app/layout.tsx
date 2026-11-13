@@ -18,7 +18,7 @@ const mono = IBM_Plex_Mono({
 
 import { IDENTITY, SITE } from '@/lib/content';
 
-const TITLE = 'Eduardo Visconti — AI Engineer · Full-Stack';
+const TITLE = 'Eduardo Visconti · AI Engineer · Full-Stack';
 const DESCRIPTION =
   'AI engineer and full-stack developer. LLM agents with iteration caps and human ' +
   'approval, and the apps people use them in.';
@@ -53,7 +53,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               mainEntity: {
                 '@type': 'Person',
                 name: 'Eduardo Visconti',
-                jobTitle: 'AI Engineer',
+                jobTitle: IDENTITY.title,
                 description: DESCRIPTION,
                 email: `mailto:${IDENTITY.email}`,
                 url: SITE,

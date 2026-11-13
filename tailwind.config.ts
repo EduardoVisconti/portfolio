@@ -2,7 +2,7 @@ import type { Config } from 'tailwindcss';
 import { PALETTE } from './lib/palette';
 
 /**
- * Encodes SPEC-tokens.md. Semantic names only — no raw hex in components.
+ * Encodes SPEC-tokens.md. Semantic names only, no raw hex in components.
  */
 const config: Config = {
   content: ['./app/**/*.{ts,tsx}', './components/**/*.{ts,tsx}'],
@@ -22,7 +22,7 @@ const config: Config = {
           secondary: '#C9CDD1', // ledger labels, chips, user body
           prose: '#9AA0A6',     // main reading grey
           muted: '#8A9096',     // nav, supporting copy
-          faint: '#8A9096',     // indices, footer, telemetry — FLOOR for real text (AA)
+          faint: '#8A9096',     // indices, footer, telemetry: FLOOR for real text (AA)
           idle: '#767C82',      // rail idle, placeholders
           dim: '#8A9096',       // work meta - carries the proof figures, so it clears AA
           label: '#7E848A',     // 10-11px caps labels ONLY - lifted above the floor
@@ -55,7 +55,7 @@ const config: Config = {
         mono: ['var(--font-mono)', 'monospace'],
       },
       fontSize: {
-        // Display — [size, { lineHeight, letterSpacing }]
+        // Display: [size, { lineHeight, letterSpacing }]
         'd-name':    ['clamp(58px,12.4vw,182px)', { lineHeight: '.84',  letterSpacing: '-.035em' }],
         'd-contact': ['clamp(34px,5vw,68px)',     { lineHeight: '1',    letterSpacing: '-.03em'  }],
         'd-ask':     ['clamp(30px,4.4vw,60px)',   { lineHeight: '1.02', letterSpacing: '-.028em' }],
