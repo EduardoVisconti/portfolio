@@ -3,6 +3,7 @@ import { test } from 'node:test';
 import {
   createRateLimiter,
   createStreamReader,
+  firstAvailable,
   frameAnswer,
   ndjsonLine,
   toGeminiHistory,
@@ -384,4 +385,96 @@ test('a truncated answer reaches the client with its words and without permissio
   const painted = seen.filter((e): e is { t: string } => 't' in e).map((e) => e.t).join('');
   assert.equal(painted, 'He owns the platform al', 'the words survive');
   assert.ok(!seen.some((e) => 'd' in e), 'and the client cannot commit them');
+});
+
+/** An attempt that never settles on its own and rejects when its signal aborts. */
+function hangs(model: string, signal: AbortSignal): Promise<string> {
+  return new Promise((_, reject) => {
+    signal.addEventListener('abort', () => reject(new Error(`${model} aborted`)));
+  });
+}
+
+// A broken deadline makes these hang rather than fail, and node:test has no
+// default timeout, so each one carries its own.
+const BOUNDED = { timeout: 2000 };
+
+test('an overloaded model hands the answer to the next one', BOUNDED, async () => {
+  // The outage this exists for: on the free tier one model returns 503 while
+  // another answers, and the route used to give up on the first.
+  const tried: string[] = [];
+  const skipped: string[] = [];
+  const got = await firstAvailable(['busy', 'free', 'never'], async (model) => {
+    tried.push(model);
+    if (model === 'busy') throw Object.assign(new Error('high demand'), { status: 503 });
+    return `answer from ${model}`;
+  }, { headersMs: 1000, skipped: (model) => skipped.push(model) });
+
+  assert.equal(got, 'answer from free');
+  assert.deepEqual(tried, ['busy', 'free'], 'a model that answered ends the search');
+  assert.deepEqual(skipped, ['busy'], 'and the one passed over reached the log');
+});
+
+test('a model that never answers is abandoned at the deadline', BOUNDED, async () => {
+  // Overloaded models also hang for most of a minute instead of refusing.
+  // Without a deadline one of those spends the visitor's whole wait.
+  const started = Date.now();
+  const got = await firstAvailable(['stuck', 'free'], async (model, signal) =>
+    model === 'stuck' ? hangs(model, signal) : 'answer', { headersMs: 30 });
+
+  assert.equal(got, 'answer');
+  assert.ok(Date.now() - started < 1000, 'moved on at the deadline, not after');
+});
+
+test('the last model is waited for, because there is nothing to move on to', BOUNDED, async () => {
+  // Abandoning the final model at the deadline turns a slow answer into none.
+  const got = await firstAvailable(['busy', 'slow'], async (model, signal) => {
+    if (model === 'busy') throw new Error('high demand');
+    await new Promise((resolve, reject) => {
+      const timer = setTimeout(resolve, 80);
+      signal.addEventListener('abort', () => { clearTimeout(timer); reject(new Error('abandoned')); });
+    });
+    return 'late but whole';
+  }, { headersMs: 20 });
+
+  assert.equal(got, 'late but whole');
+});
+
+test('the deadline stops counting once a model has answered', BOUNDED, async () => {
+  // The SDK's own timeout is never cleared, so it would cut a streaming answer
+  // off halfway. This one must leave the winning signal alone for good.
+  let kept: AbortSignal | undefined;
+  await firstAvailable(['free', 'spare'], async (_model, signal) => { kept = signal; return 'ok'; },
+    { headersMs: 20 });
+  await new Promise((r) => setTimeout(r, 60));
+
+  assert.equal(kept?.aborted, false);
+});
+
+test('a visitor who leaves stops the search and the answer already streaming', BOUNDED, async () => {
+  const gone = new AbortController();
+  const tried: string[] = [];
+  const pending = firstAvailable(['first', 'second'], async (model, signal) => {
+    tried.push(model);
+    return hangs(model, signal);
+  }, { headersMs: 1000, gone: gone.signal });
+  gone.abort();
+
+  await assert.rejects(pending, /first aborted/);
+  assert.deepEqual(tried, ['first'], 'no model is tried for an empty tab');
+
+  // The winner stays linked: leaving mid-answer aborts the stream it opened.
+  const later = new AbortController();
+  let winner: AbortSignal | undefined;
+  await firstAvailable(['free'], async (_model, signal) => { winner = signal; return 'ok'; },
+    { headersMs: 1000, gone: later.signal });
+  later.abort();
+  assert.equal(winner?.aborted, true);
+});
+
+test('when every model fails, the last failure is what the route reports', BOUNDED, async () => {
+  await assert.rejects(
+    firstAvailable(['a', 'b'], async (model) => { throw new Error(`${model} failed`); },
+      { headersMs: 1000 }),
+    /b failed/,
+  );
 });
