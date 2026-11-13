@@ -122,7 +122,7 @@ export const WORK: WorkItem[] = [
       'progress live in one app, and the whole workout fits on one screen like a ' +
       'spreadsheet, edited with a tap. I tested the popular apps and none of them covered ' +
       'all of it, so I built Forja from what each one did best. The iOS beta on TestFlight ' +
-      'is open to anyone with the link and has 10 testers, and the web app is live. A full ' +
+      'is open to anyone with the link, and the web app is live. A full ' +
       'redesign is in progress.',
     meta: ['5,000+ TESTS', 'OFFLINE-FIRST', 'REACT NATIVE', 'SUPABASE'],
     links: [
