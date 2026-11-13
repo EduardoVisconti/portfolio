@@ -22,10 +22,10 @@ const easeOutCubic = (p: number) => 1 - Math.pow(1 - p, 3);
 /**
  * One listener for every counter on the page, not one each.
  *
- * Eleven instances mount here; eleven `scroll` handlers each reading layout was
- * eleven forced reflows per event on the first pass down the page. The set
- * empties itself as counters fire, and the listener is removed with the last
- * one.
+ * Every counter on the page mounts here. A `scroll` handler per counter, each
+ * reading layout, was one forced reflow per counter per event on the first pass
+ * down the page. The set empties itself as counters fire, and the listener is
+ * removed with the last one.
  */
 const watchers = new Set<() => void>();
 let listening = false;

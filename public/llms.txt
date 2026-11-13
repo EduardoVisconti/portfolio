@@ -1,46 +1,46 @@
 # Eduardo Visconti
 
-> AI Engineer and full-stack developer in Tampa, FL. Builds production systems
-> where an LLM agent is part of the runtime: budget ceilings, human approval
-> gates, failure classification, self-healing when an upstream source changes
-> shape.
+> AI engineer and full-stack developer in Tampa, FL. Builds LLM agents with
+> iteration caps and human approval, and the apps people use them in.
 
 ## Current role
 
-AI Engineer at United Financial Resources (Bradenton, FL) since April 2026.
-Sole engineer on an automated property-deed retrieval platform with nationwide
-US county coverage: 77 vendor-portal integrations behind one dispatcher, an
-agent layer built on Anthropic and OpenAI tool-use, 46 architecture decision
-records, and 68,672 lines of tests against 50,302 lines of source. Also builds
-the client for an internal multi-agent platform, shipped through review by three
-other engineers.
+AI Developer at United Financial Resources (Bradenton, FL) since April 2026.
+Built from scratch, and owns, the company's deed retrieval service, made to
+replace a lookup that takes someone 10 to 30 minutes by hand: integrations for
+70+ records-portal platforms, 840+ counties set up for automated search, 60
+architecture decision records, and 7,500+ tests run inside the shipped image on
+every pull request. An LLM agent capped by iterations diagnoses broken portals
+and proposes fixes, and a person approves any change to a county's validation or
+retrieval settings. Also leads the frontend of AI Hub, the company's internal
+multi-agent chat platform, used by about 60 employees.
 
 ## Work
 
-- Forja — his own product. Offline-first hybrid-training app: React Native,
-  Next.js, PostgreSQL with row-level security. 187 pull requests, an iOS build
-  on TestFlight and a written case study. https://app.forjahybrid.com
-- Deed retrieval platform — private, no link. Sole engineer, 1,271 of 1,297
-  commits, 77 vendor-portal integrations, nationwide US county coverage, 46
-  architecture decision records.
-- AI Hub — internal, no link. Multi-agent platform; he builds the Next.js and
-  React 19 client with a custom NDJSON streaming protocol, against a
-  Python/FastAPI/Agno backend. 32 pull requests, reviewed by three engineers.
-- Sueli Repulho — client delivery, shipped. Practice site and the subscription
-  product beside it, for a clinical psychologist with 42 years of practice.
-  Astro, SEO-first, CI security gates. https://suelirepulho.com.br
-- LeadFlow CRM — client delivery, open source.
-  https://leadflow-electronics.vercel.app
+- Forja: his own product, built solo since March 2026. A training app for
+  lifting, HYROX, functional work and running, offline-first, React Native and
+  Expo on Supabase, 5,000+ tests. iOS beta on TestFlight, open to anyone with
+  the link, and a live web app. https://app.forjahybrid.com
+- Deed retrieval platform: private, no link. Described above.
+- AI Hub: internal, no link. Frontend lead: the full interface redesign, a fix
+  for a streaming race that lost agent replies, and the MCP server that lets
+  its agents search for deeds.
+- ConsciencIA: client work, live. A private journaling app where a psychology
+  practice's patients get AI feedback on what they write, with entries
+  encrypted at rest and consent given item by item.
+- Sueli Repulho: client work. The website and course sales pages for a
+  clinical psychologist, static Astro with a PHP lead form.
 
 ## Stack
 
-Python, FastAPI, asyncio, pytest, Playwright, PostgreSQL with row-level
-security, TypeScript, React, React Native, Next.js, Docker, GitHub Actions,
-Anthropic and OpenAI tool-use, MCP, RAG.
+Python, FastAPI, asyncio, pytest, Playwright, Vitest, PostgreSQL with row-level
+security, TypeScript, React, React Native, Expo, Next.js, Docker, GitHub
+Actions, LLM agents with tool calling, MCP, LiteLLM with self-hosted models.
 
 ## Contact
 
 eduardo.visconti.dev@gmail.com · https://linkedin.com/in/eduardo-visconti ·
 https://github.com/EduardoVisconti
 
-Fluent in English, Spanish and Portuguese. Authorized to work in the United States.
+English and Portuguese (native), Spanish (fluent). Authorized to work in the
+United States.

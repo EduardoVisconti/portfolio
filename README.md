@@ -1,4 +1,4 @@
-![Eduardo Visconti — AI Engineer, Full-Stack](docs/site.jpg)
+![Eduardo Visconti: AI Engineer, Full-Stack](docs/site.jpg)
 
 # eduardo-visconti.vercel.app
 
@@ -6,7 +6,7 @@
 cannot be shown.**
 
 [![CI](https://github.com/EduardoVisconti/portfolio/actions/workflows/ci.yml/badge.svg)](https://github.com/EduardoVisconti/portfolio/actions/workflows/ci.yml)
-![Next.js 15](https://img.shields.io/badge/Next.js-15-000)
+![Next.js 16](https://img.shields.io/badge/Next.js-16-000)
 ![React 19](https://img.shields.io/badge/React-19-000)
 ![TypeScript strict](https://img.shields.io/badge/TypeScript-strict-000)
 
@@ -17,16 +17,16 @@ cannot be shown.**
 ## Why this exists, and why it looks like this
 
 Most portfolios are a grid of project cards. That format assumes the work can be
-linked to. Here it mostly cannot: the flagship is a production platform whose
+linked to. Here it mostly cannot: the flagship is a platform whose
 source is private, so a link grid would leave the strongest thing on the page as
 a card with no href.
 
 So the site argues three other ways instead.
 
-**Verified figures, each with the period it was earned over.** A number without a
-time denominator is a shrug, so every row carries its dates and the reader does
-the division. 77 vendor-portal integrations means one thing over four years and
-something else over five months.
+**Verified figures, read against the work they came from.** A number without a
+time denominator is a shrug, so every work row carries its dates and the reader
+does the division: 70+ portal platforms reads against a start in April 2026, not
+against a career.
 
 **Three engineering decisions, written out in full.** Not a skills list. A claim
 in display type, then the reasoning: why a deletion that is merely an absence
@@ -132,7 +132,7 @@ works, so section 07 is an email address and two links.
 
 ```bash
 npm ci
-cp .env.example .env.local   # GEMINI_API_KEY — free, no card, aistudio.google.com/apikey
+cp .env.example .env.local   # GEMINI_API_KEY: free, no card, aistudio.google.com/apikey
 npm run dev
 ```
 
@@ -153,11 +153,11 @@ pretending to be live.
 
 Every pull request runs, and must pass:
 
-- **invariants** — the rules in [`CONTRIBUTING.md`](CONTRIBUTING.md), as a script
+- **invariants**: the rules in [`CONTRIBUTING.md`](CONTRIBUTING.md), as a script
 - **typecheck, lint, build**
-- **gitleaks** — secret scan over full history
-- **osv-scanner** — dependency advisories
-- **lychee** — every external URL the page claims still resolves
+- **gitleaks**: secret scan over full history
+- **osv-scanner**: dependency advisories
+- **lychee**: every external URL the page claims still resolves
 
 The last one earns its place: every claim here is a link out, a 404 costs more
 than a lint error, and nothing else in the pipeline would catch it.
@@ -198,4 +198,4 @@ prose is a rule that decays, which is the argument the site itself makes.
 
 ## License
 
-No license. All rights reserved — this is a personal site, not a template.
+No license. All rights reserved: this is a personal site, not a template.

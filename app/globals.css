@@ -15,7 +15,7 @@
     margin: 0;
   }
 
-  /* Users add links over time — never leave them browser-blue. */
+  /* Users add links over time; never leave them browser-blue. */
   a { color: inherit; text-decoration: none; transition: color .2s ease; }
   a:hover { color: var(--accent); }
 
@@ -49,7 +49,6 @@
   @keyframes heroIn { from { opacity:0; transform: translateY(30px); } to { opacity:1; transform:none; } }
   @keyframes rvx    { from { opacity:0; transform: scaleX(0); }        to { opacity:1; transform: scaleX(1); } }
   @keyframes fadeIn { from { opacity:0; }                              to { opacity:1; } }
-  @keyframes bar    { from { transform: scaleX(0); }                   to { transform: scaleX(1); } }
   @keyframes prog   { from { transform: scaleX(0); }                   to { transform: scaleX(1); } }
 
   /*
@@ -68,10 +67,6 @@
   @supports not (animation-timeline: view()) {
     .reveal { animation: none; opacity: 1; transform: none; }
   }
-
-  .bar-draw { transform-origin: 0 50%; animation: bar 1.2s cubic-bezier(.16,1,.3,1) both;
-              animation-timeline: view(); animation-range: entry 0% cover 32%; }
-  .bar-draw-slow { animation-duration: 1.4s; animation-range: entry 0% cover 30%; }
 
   .scroll-progress { transform-origin: 0 50%; animation: prog linear both;
                      animation-timeline: scroll(root); }

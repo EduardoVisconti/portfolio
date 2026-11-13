@@ -1,8 +1,10 @@
 name: Monthly portfolio refresh
 
-# The site's figures go stale silently: commits accumulate, integrations get
-# added, projects ship. This opens one issue a month so the numbers get a
-# deliberate review instead of drifting.
+# The site's figures go stale silently, and so do the five other places that
+# repeat them. This opens one issue a month so they get a deliberate review
+# instead of drifting. The figures themselves live in a career inventory kept
+# outside this repo, so the issue lists surfaces, not numbers: a number typed
+# here would go stale like any other.
 #
 # Note: scheduled workflows only run from the default branch, so this starts
 # firing once it is merged to main.
@@ -28,35 +30,25 @@ jobs:
             });
 
             const body = [
-              '@EduardoVisconti - monthly check on the numbers behind the site.',
+              '@EduardoVisconti - monthly check on the six surfaces that state the same facts.',
               '',
-              'Every figure on the page lives in `lib/content.ts`. They are stated as fact,',
-              'so a stale one is a wrong one. Ask Claude to pull the current values and',
-              'open a PR with whatever moved.',
+              'No Claude Code: "atualiza o inventário de carreira". Só atualize se algum número',
+              'cruzou o próximo patamar, ou se houve entrega nova, marco ou mudança de papel.',
               '',
-              '### Figures to re-derive',
+              '### Surfaces, in this order',
               '',
-              '- [ ] Commits and commit share on the deed platform (currently 1,271 of 1,297)',
-              '- [ ] Vendor-portal integrations (currently 77)',
-              '- [ ] County coverage (currently 3,000+)',
-              '- [ ] Architecture decision records (currently 46)',
-              '- [ ] Pull requests shipped and merge rate (currently 120 at 93%)',
-              '- [ ] Test lines vs source lines (currently 68,672 / 50,302, ratio 1.37x)',
-              '- [ ] Pull requests on Forja (currently 187)',
-              '',
-              '### Beyond the numbers',
-              '',
-              '- [ ] Any new project worth a row in `WORK`? The ledger grows by appending.',
-              '- [ ] Sueli v2 shipped? If so it earns a row and a case study.',
-              '- [ ] Any new engineering decision worth adding to `THINKING`?',
-              '- [ ] Stack still accurate in `lib/content.ts` and `lib/assistant-context.ts`?',
-              '- [ ] Every external link still resolves.',
-              '- [ ] Role, employer and title still current.',
+              '- [ ] Resume, versions A and B',
+              '- [ ] `public/resume.pdf`',
+              '- [ ] This site: `lib/content.ts`, `lib/assistant-context.ts` and `public/llms.txt`',
+              '- [ ] LinkedIn',
+              '- [ ] GitHub profile README (`EduardoVisconti/EduardoVisconti`)',
+              '- [ ] `forja-case-study`',
               '',
               '### Reminder',
               '',
-              'If a number changes in `content.ts`, change it in `assistant-context.ts` too.',
-              'The assistant states these figures out loud and will contradict the page otherwise.',
+              'If a number changes in `content.ts`, change it in `assistant-context.ts`,',
+              '`public/llms.txt` and `README.md` too. `npm run invariants` checks the first',
+              'two and `llms.txt`; the README is on you.',
             ].join('\n');
 
             await github.rest.issues.create({
